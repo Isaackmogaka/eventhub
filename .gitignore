@@ -1,0 +1,19 @@
+# dependencies
+node_modules/
+
+# env files - never commit secrets
+.env
+.env.local
+*.env
+
+# build output
+.next/
+dist/
+build/
+
+# logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
