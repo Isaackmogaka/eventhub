@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
+import eventsRoutes from './routes/events';
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/auth', authRoutes);
+app.use('/events', eventsRoutes);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
