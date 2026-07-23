@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ATTENDEE
+  ORGANIZER
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role     @default(ATTENDEE)
+  createdAt    DateTime @default(now())
+
+  organizer Organizer?
+}
+
+model Organizer {
+  id                 String   @id @default(uuid())
+  userId             String   @unique
+  user               User     @relation(fields: [userId], references: [id])
+  stripeAccountId    String?
+  onboardingComplete Boolean  @default(false)
+  createdAt          DateTime @default(now())
+
+  events Event[]
+}
+
+model Event {
+  id           String      @id @default(uuid())
+  organizerId  String
+  organizer    Organizer   @relation(fields: [organizerId], references: [id])
+  title        String
+  description  String?
+  category     String?
+  location     String?
+  isOnline     Boolean     @default(false)
+  startsAt     DateTime
+  priceCents   Int
+  totalTickets Int
+  ticketsSold  Int         @default(0)
+  status       EventStatus @default(DRAFT)
+  createdAt    DateTime    @default(now())
+}
