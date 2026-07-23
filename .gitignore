@@ -17,3 +17,10 @@ npm-debug.log*
 
 # OS files
 .DS_Store
+/generated/prisma
+
+# editor/AI tool configs - not part of the app
+.agents/
+.claude/
+.windsurf/
+skills-lock.json
