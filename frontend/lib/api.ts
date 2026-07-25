@@ -72,3 +72,14 @@ export async function createHold(eventId: string, quantity: number) {
   if (!res.ok) throw new Error(json.error || 'Failed to reserve ticket');
   return json;
 }
+
+export async function cancelHold(holdId: string) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/events/holds/${holdId}/cancel`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Failed to cancel reservation');
+  return json;
+}

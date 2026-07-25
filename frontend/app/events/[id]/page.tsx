@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getEvent, createHold } from '@/lib/api';
+import { getEvent, createHold, cancelHold } from '@/lib/api';
 import { getToken } from '@/lib/auth';
 
 interface EventDetail {
@@ -67,6 +67,17 @@ export default function EventDetailPage() {
     const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
   }, [hold]);
+
+  async function handleCancel() {
+    if (!hold) return;
+    try {
+      await cancelHold(hold.id);
+      setHold(null);
+      setHoldError('');
+    } catch (err) {
+      setHoldError(err instanceof Error ? err.message : 'Failed to cancel reservation');
+    }
+  }
 
   async function handleGetTicket() {
     const token = getToken();
@@ -158,7 +169,15 @@ export default function EventDetailPage() {
               <p className="text-sm font-semibold text-status-amber">Ticket reserved</p>
               <p className="text-xs text-gray-600 mt-0.5">Complete checkout before your hold expires.</p>
             </div>
-            <p className="text-lg font-bold text-status-amber tabular-nums">{formatCountdown(secondsLeft)}</p>
+            <div className="flex items-center gap-3">
+              <p className="text-lg font-bold text-status-amber tabular-nums">{formatCountdown(secondsLeft)}</p>
+              <button
+                onClick={handleCancel}
+                className="text-xs font-semibold text-gray-600 border border-gray-300 rounded-lg px-3 py-1.5 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         )}
 
