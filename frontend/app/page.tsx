@@ -73,7 +73,7 @@ export default function HomePage() {
               <Link
                 key={event.id}
                 href={`/events/${event.id}`}
-                className="bg-white border border-gray-200 rounded-xl overflow-hidden block hover:border-brand-purple transition-colors"
+                className="bg-white border border-gray-200 rounded-xl overflow-hidden block hover:border-brand-purple hover:shadow-lg hover:scale-[1.02] transition-all duration-200"
               >
                 <div className="h-24 bg-gradient-to-br from-brand-purple to-brand-navy" />
                 <div className="p-4">

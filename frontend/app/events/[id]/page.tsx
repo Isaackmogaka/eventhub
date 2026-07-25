@@ -249,7 +249,7 @@ export default function EventDetailPage() {
             <button
               onClick={handleGetTicket}
               disabled={available <= 0 || holding}
-              className="bg-brand-purple text-white font-semibold rounded-lg px-6 py-2.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+              className="bg-brand-purple text-white font-semibold rounded-lg px-6 py-2.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-brand-purple-dark active:scale-95 transition-all duration-150"
             >
               {holding ? 'Reserving...' : available > 0 ? 'Get Ticket' : 'Sold Out'}
             </button>

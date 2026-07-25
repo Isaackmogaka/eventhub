@@ -124,7 +124,7 @@ export default function DashboardPage() {
           {user?.role === 'ORGANIZER' && (
             <Link
               href="/events/new"
-              className="bg-brand-purple text-white text-sm font-semibold rounded-lg px-4 py-2"
+              className="bg-brand-purple text-white text-sm font-semibold rounded-lg px-4 py-2 hover:bg-brand-purple-dark active:scale-95 transition-all duration-150"
             >
               + Create Event
             </Link>
@@ -142,7 +142,7 @@ export default function DashboardPage() {
         ) : (
           <div className="grid grid-cols-3 gap-4">
             {events.map((event) => (
-              <Link key={event.id} href={`/events/${event.id}`} className="bg-white border border-gray-200 rounded-xl overflow-hidden block hover:border-brand-purple transition-colors">
+              <Link key={event.id} href={`/events/${event.id}`} className="bg-white border border-gray-200 rounded-xl overflow-hidden block hover:border-brand-purple hover:shadow-lg hover:scale-[1.02] transition-all duration-200">
                 <div className="h-24 bg-gradient-to-br from-brand-purple to-brand-navy" />
                 <div className="p-4">
                   <p className="font-bold text-sm text-gray-900 mb-1">{event.title}</p>
