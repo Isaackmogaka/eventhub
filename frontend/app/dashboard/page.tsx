@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRequireAuth } from '@/lib/hooks';
 import { getEvents } from '@/lib/api';
+import { EventCardSkeleton } from '@/lib/components/EventCardSkeleton';
 
 interface EventItem {
   id: string;
@@ -131,7 +132,11 @@ export default function DashboardPage() {
         </div>
 
         {loading ? (
-          <p className="text-sm text-gray-600">Loading events...</p>
+          <div className="grid grid-cols-3 gap-4">
+            {[...Array(3)].map((_, i) => (
+              <EventCardSkeleton key={i} />
+            ))}
+          </div>
         ) : events.length === 0 ? (
           <p className="text-sm text-gray-600">No events yet.</p>
         ) : (

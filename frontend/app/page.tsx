@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getEvents } from '@/lib/api';
+import { EventCardSkeleton } from '@/lib/components/EventCardSkeleton';
 
 interface EventItem {
   id: string;
@@ -59,7 +60,11 @@ export default function HomePage() {
         <h2 className="text-lg font-bold text-gray-900 mb-4">Upcoming events</h2>
 
         {loading ? (
-          <p className="text-sm text-gray-600">Loading events...</p>
+          <div className="grid grid-cols-3 gap-4">
+            {[...Array(6)].map((_, i) => (
+              <EventCardSkeleton key={i} />
+            ))}
+          </div>
         ) : events.length === 0 ? (
           <p className="text-sm text-gray-600">No events available yet. Check back soon.</p>
         ) : (

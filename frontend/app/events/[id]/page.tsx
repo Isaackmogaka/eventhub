@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { getEvent, createHold, cancelHold } from '@/lib/api';
 import { io, Socket } from 'socket.io-client';
 import { useToast } from '@/lib/toast/ToastContext';
+import { Skeleton } from '@/lib/components/Skeleton';
 import { getToken } from '@/lib/auth';
 
 interface EventDetail {
@@ -124,8 +125,16 @@ export default function EventDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-sm text-gray-600">Loading event...</p>
+      <div className="min-h-screen bg-background">
+        <div className="max-w-3xl mx-auto px-6 py-10">
+          <Skeleton className="h-4 w-24 mb-6" />
+          <Skeleton className="h-56 w-full rounded-xl mb-6" />
+          <Skeleton className="h-6 w-24 rounded-full mb-3" />
+          <Skeleton className="h-8 w-2/3 mb-3" />
+          <Skeleton className="h-4 w-1/2 mb-2" />
+          <Skeleton className="h-4 w-1/3 mb-8" />
+          <Skeleton className="h-24 w-full rounded-xl" />
+        </div>
       </div>
     );
   }
