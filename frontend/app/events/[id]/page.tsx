@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getEvent, createHold, cancelHold } from '@/lib/api';
+import { io, Socket } from 'socket.io-client';
 import { getToken } from '@/lib/auth';
 
 interface EventDetail {
@@ -39,12 +40,31 @@ export default function EventDetailPage() {
   const [holdError, setHoldError] = useState('');
   const [holding, setHolding] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
+  const [liveAvailable, setLiveAvailable] = useState<number | null>(null);
 
   useEffect(() => {
     getEvent(id)
       .then(setEvent)
       .catch(() => setError('This event could not be found.'))
       .finally(() => setLoading(false));
+  }, [id]);
+
+  // Real-time availability: connect, join this event's room, listen for updates
+  useEffect(() => {
+    const socket: Socket = io(process.env.NEXT_PUBLIC_API_URL!);
+
+    socket.emit('join-event', id);
+
+    socket.on('availability-update', (data: { eventId: string; available: number }) => {
+      if (data.eventId === id) {
+        setLiveAvailable(data.available);
+      }
+    });
+
+    return () => {
+      socket.emit('leave-event', id);
+      socket.disconnect();
+    };
   }, [id]);
 
   // Countdown timer: recalculates every second while a hold is active
@@ -117,7 +137,8 @@ export default function EventDetailPage() {
     );
   }
 
-  const available = event.totalTickets - event.ticketsSold;
+  const initialAvailable = event.totalTickets - event.ticketsSold;
+  const available = liveAvailable !== null ? liveAvailable : initialAvailable;
 
   function formatCountdown(seconds: number) {
     const m = Math.floor(seconds / 60);
