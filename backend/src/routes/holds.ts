@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { requireAuth, AuthRequest } from '../middleware/auth';
+import { broadcastAvailability } from '../lib/socket';
 
 const router = Router();
 
@@ -57,6 +58,15 @@ router.post('/:eventId/hold', requireAuth, async (req: AuthRequest, res) => {
       });
     });
 
+    const events = await prisma.event.findUnique({ where: { id: eventId } });
+    const activeHolds = await prisma.ticketHold.aggregate({
+      where: { eventId, status: 'ACTIVE', expiresAt: { gt: new Date() } },
+      _sum: { quantity: true },
+    });
+    const heldQty = activeHolds._sum.quantity || 0;
+    const stillAvailable = events!.totalTickets - events!.ticketsSold - heldQty;
+    broadcastAvailability(eventId, stillAvailable);
+
     res.status(201).json(hold);
   } catch (err) {
     if (err instanceof Error && err.message === 'EVENT_NOT_FOUND') {
@@ -91,6 +101,15 @@ router.post('/holds/:holdId/cancel', requireAuth, async (req: AuthRequest, res) 
     where: { id: holdId },
     data: { status: 'CANCELLED' },
   });
+
+  const event = await prisma.event.findUnique({ where: { id: updated.eventId } });
+  const activeHolds = await prisma.ticketHold.aggregate({
+    where: { eventId: updated.eventId, status: 'ACTIVE', expiresAt: { gt: new Date() } },
+    _sum: { quantity: true },
+  });
+  const heldQty = activeHolds._sum.quantity || 0;
+  const stillAvailable = event!.totalTickets - event!.ticketsSold - heldQty;
+  broadcastAvailability(updated.eventId, stillAvailable);
 
   res.json(updated);
 });

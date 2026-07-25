@@ -1,10 +1,13 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 import authRoutes from './routes/auth';
 import eventsRoutes from './routes/events';
 import holdsRoutes from './routes/holds';
 import { expireStaleHolds } from './lib/expireHolds';
+import { setIO } from './lib/socket';
 
 dotenv.config();
 
@@ -20,11 +23,28 @@ app.use('/auth', authRoutes);
 app.use('/events', eventsRoutes);
 app.use('/events', holdsRoutes);
 
+const httpServer = createServer(app);
+
+const io = new Server(httpServer, {
+  cors: { origin: process.env.FRONTEND_URL },
+});
+
+setIO(io);
+
+io.on('connection', (socket) => {
+  socket.on('join-event', (eventId: string) => {
+    socket.join(`event:${eventId}`);
+  });
+
+  socket.on('leave-event', (eventId: string) => {
+    socket.leave(`event:${eventId}`);
+  });
+});
+
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 
-  // Sweep for expired holds every 60 seconds
   setInterval(() => {
     expireStaleHolds().catch((err) => console.error('Hold expiry sweep failed:', err));
   }, 60 * 1000);
