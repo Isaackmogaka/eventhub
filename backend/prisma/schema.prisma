@@ -29,6 +29,7 @@ model User {
   organizer Organizer?
   holds     TicketHold[]
   payments  Payment[]
+  tickets   Ticket[]
 }
 
 model Organizer {
@@ -60,6 +61,7 @@ model Event {
 
   holds        TicketHold[]
   payments     Payment[]
+  tickets      Ticket[]
 }
 
 enum HoldStatus {
@@ -103,4 +105,27 @@ model Payment {
   status        PaymentStatus @default(PENDING)
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
+
+  ticket        Ticket?
+}
+
+enum TicketStatus {
+  CONFIRMED
+  CANCELLED
+  CHECKED_IN
+}
+
+model Ticket {
+  id            String       @id @default(uuid())
+  eventId       String
+  event         Event        @relation(fields: [eventId], references: [id])
+  userId        String
+  user          User         @relation(fields: [userId], references: [id])
+  paymentId     String       @unique
+  payment       Payment      @relation(fields: [paymentId], references: [id])
+  quantity      Int
+  qrCode        String       @unique
+  status        TicketStatus @default(CONFIRMED)
+  checkedInAt   DateTime?
+  createdAt     DateTime     @default(now())
 }
