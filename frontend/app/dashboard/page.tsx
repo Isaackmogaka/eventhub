@@ -58,7 +58,17 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        <h2 className="text-lg font-bold text-gray-900 mb-4">Events</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-gray-900">Events</h2>
+          {user?.role === 'ORGANIZER' && (
+            <Link
+              href="/events/new"
+              className="bg-brand-purple text-white text-sm font-semibold rounded-lg px-4 py-2"
+            >
+              + Create Event
+            </Link>
+          )}
+        </div>
         {loading ? (
           <p className="text-sm text-gray-600">Loading events...</p>
         ) : events.length === 0 ? (
