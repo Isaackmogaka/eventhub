@@ -57,3 +57,18 @@ export async function createEvent(data: {
   if (!res.ok) throw new Error(json.error || 'Failed to create event');
   return json;
 }
+
+export async function createHold(eventId: string, quantity: number) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/events/${eventId}/hold`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ quantity }),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Failed to reserve ticket');
+  return json;
+}
