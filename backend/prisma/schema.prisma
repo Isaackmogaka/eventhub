@@ -27,6 +27,7 @@ model User {
   createdAt    DateTime @default(now())
 
   organizer Organizer?
+  holds     TicketHold[]
 }
 
 model Organizer {
@@ -55,4 +56,25 @@ model Event {
   ticketsSold  Int         @default(0)
   status       EventStatus @default(DRAFT)
   createdAt    DateTime    @default(now())
+
+  holds        TicketHold[]
+}
+
+enum HoldStatus {
+  ACTIVE
+  CONVERTED
+  EXPIRED
+  CANCELLED
+}
+
+model TicketHold {
+  id         String     @id @default(uuid())
+  eventId    String
+  event      Event      @relation(fields: [eventId], references: [id])
+  userId     String
+  user       User       @relation(fields: [userId], references: [id])
+  quantity   Int
+  status     HoldStatus @default(ACTIVE)
+  expiresAt  DateTime
+  createdAt  DateTime   @default(now())
 }
