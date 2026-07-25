@@ -7,6 +7,7 @@ import authRoutes from './routes/auth';
 import eventsRoutes from './routes/events';
 import holdsRoutes from './routes/holds';
 import paymentsRoutes from './routes/payments';
+import webhooksRoutes from './routes/webhooks';
 import { expireStaleHolds } from './lib/expireHolds';
 import { setIO } from './lib/socket';
 
@@ -24,6 +25,7 @@ app.use('/auth', authRoutes);
 app.use('/events', eventsRoutes);
 app.use('/events', holdsRoutes);
 app.use('/payments', paymentsRoutes);
+app.use('/webhooks', webhooksRoutes);
 
 const httpServer = createServer(app);
 
