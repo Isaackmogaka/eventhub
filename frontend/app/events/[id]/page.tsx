@@ -153,7 +153,15 @@ export default function EventDetailPage() {
           &larr; Back to events
         </Link>
 
-        <div className="h-56 rounded-xl bg-gradient-to-br from-brand-purple to-brand-navy mb-6" />
+        <div className="h-56 rounded-xl bg-gradient-to-br from-brand-purple to-brand-navy mb-6 relative">
+          <div className="absolute top-3 left-3 bg-brand-purple text-white text-xs font-semibold px-3 py-1 rounded-full">
+            Featured
+          </div>
+          <div className="absolute top-3 right-3 flex gap-2">
+            <button className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center text-sm">&#9825;</button>
+            <button className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center text-sm">&#8635;</button>
+          </div>
+        </div>
 
         <div className="flex items-center gap-2 mb-3">
           <span className="text-xs font-semibold text-brand-purple bg-brand-purple-light px-2.5 py-1 rounded-full">
