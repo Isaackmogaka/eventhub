@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
 import eventsRoutes from './routes/events';
 import holdsRoutes from './routes/holds';
+import { expireStaleHolds } from './lib/expireHolds';
 
 dotenv.config();
 
@@ -22,4 +23,9 @@ app.use('/events', holdsRoutes);
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+
+  // Sweep for expired holds every 60 seconds
+  setInterval(() => {
+    expireStaleHolds().catch((err) => console.error('Hold expiry sweep failed:', err));
+  }, 60 * 1000);
 });
