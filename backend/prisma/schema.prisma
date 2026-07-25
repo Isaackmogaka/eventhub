@@ -28,6 +28,7 @@ model User {
 
   organizer Organizer?
   holds     TicketHold[]
+  payments  Payment[]
 }
 
 model Organizer {
@@ -58,6 +59,7 @@ model Event {
   createdAt    DateTime    @default(now())
 
   holds        TicketHold[]
+  payments     Payment[]
 }
 
 enum HoldStatus {
@@ -77,4 +79,28 @@ model TicketHold {
   status     HoldStatus @default(ACTIVE)
   expiresAt  DateTime
   createdAt  DateTime   @default(now())
+
+  payment    Payment?
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  holdId        String        @unique
+  hold          TicketHold    @relation(fields: [holdId], references: [id])
+  userId        String
+  user          User          @relation(fields: [userId], references: [id])
+  eventId       String
+  event         Event         @relation(fields: [eventId], references: [id])
+  amountCents   Int
+  phoneNumber   String
+  invoiceId     String?       @unique
+  status        PaymentStatus @default(PENDING)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }
