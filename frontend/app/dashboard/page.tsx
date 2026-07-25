@@ -33,13 +33,13 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-background flex">
       <aside className="w-60 bg-brand-navy text-white p-4 flex flex-col">
-        <div className="flex items-center gap-2 px-2 pb-6">
+        <Link href="/" className="flex items-center gap-2 px-2 pb-6">
           <div className="w-9 h-9 rounded-lg bg-brand-purple flex items-center justify-center font-bold text-sm">E</div>
           <div>
             <p className="font-bold text-sm">EventHub</p>
             <p className="text-xs text-gray-400">Event Management</p>
           </div>
-        </div>
+        </Link>
         <nav className="flex-1 flex flex-col gap-1 text-sm">
           <span className="bg-brand-purple rounded-lg px-3 py-2.5 font-semibold">Dashboard</span>
           <span className="px-3 py-2.5 text-gray-300">Events</span>
