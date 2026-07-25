@@ -70,4 +70,29 @@ router.post('/:eventId/hold', requireAuth, async (req: AuthRequest, res) => {
   }
 });
 
+router.post('/holds/:holdId/cancel', requireAuth, async (req: AuthRequest, res) => {
+  const { holdId } = req.params;
+
+  const hold = await prisma.ticketHold.findUnique({ where: { id: holdId } });
+
+  if (!hold) {
+    return res.status(404).json({ error: 'Hold not found' });
+  }
+
+  if (hold.userId !== req.userId) {
+    return res.status(403).json({ error: 'You can only cancel your own reservation' });
+  }
+
+  if (hold.status !== 'ACTIVE') {
+    return res.status(400).json({ error: 'This reservation is no longer active' });
+  }
+
+  const updated = await prisma.ticketHold.update({
+    where: { id: holdId },
+    data: { status: 'CANCELLED' },
+  });
+
+  res.json(updated);
+});
+
 export default router;
