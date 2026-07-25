@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getEvent, createHold, cancelHold } from '@/lib/api';
 import { io, Socket } from 'socket.io-client';
+import { useToast } from '@/lib/toast/ToastContext';
 import { getToken } from '@/lib/auth';
 
 interface EventDetail {
@@ -30,6 +31,7 @@ interface HoldInfo {
 export default function EventDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { showToast } = useToast();
   const id = params.id as string;
 
   const [event, setEvent] = useState<EventDetail | null>(null);
@@ -94,6 +96,7 @@ export default function EventDetailPage() {
       await cancelHold(hold.id);
       setHold(null);
       setHoldError('');
+      showToast('Reservation cancelled.', 'info');
     } catch (err) {
       setHoldError(err instanceof Error ? err.message : 'Failed to cancel reservation');
     }
@@ -111,6 +114,7 @@ export default function EventDetailPage() {
     try {
       const newHold = await createHold(id, 1);
       setHold(newHold);
+      showToast('Ticket reserved! Complete checkout within 10 minutes.', 'success');
     } catch (err) {
       setHoldError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
