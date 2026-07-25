@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { registerUser } from '@/lib/api';
 import { saveSession } from '@/lib/auth';
 
@@ -30,62 +31,87 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl border border-gray-200 w-full max-w-sm">
-        <h1 className="text-xl font-bold text-gray-900 mb-6">Create your account</h1>
+    <div className="min-h-screen flex">
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-brand-purple to-brand-navy relative overflow-hidden flex-col justify-center px-16">
+        <div className="absolute inset-0 opacity-20" style={{
+          backgroundImage: 'radial-gradient(circle at 20% 30%, white 1px, transparent 1px), radial-gradient(circle at 70% 60%, white 1px, transparent 1px)',
+          backgroundSize: '60px 60px',
+        }} />
+        <div className="relative">
+          <h1 className="text-4xl font-bold text-white mb-4 leading-tight">
+            Discover.<br />Book.<br />Experience.
+          </h1>
+          <p className="text-white/80 text-sm max-w-xs">
+            Find and book amazing events near you. Make memories that last forever.
+          </p>
+        </div>
+      </div>
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-3 mb-4">
-            {error}
-          </div>
-        )}
+      <div className="flex-1 flex items-center justify-center bg-background px-6 py-10">
+        <form onSubmit={handleSubmit} className="w-full max-w-sm">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Create your account</h1>
+          <p className="text-sm text-gray-600 mb-8">Join EventHub and start exploring</p>
 
-        <label className="block text-sm font-medium text-gray-800 mb-1">Name</label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 mb-4 text-sm"
-          required
-        />
+          {error && (
+            <div className="bg-status-red-bg border border-red-200 text-status-red text-sm rounded-lg p-3 mb-4">
+              {error}
+            </div>
+          )}
 
-        <label className="block text-sm font-medium text-gray-800 mb-1">Email</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 mb-4 text-sm"
-          required
-        />
+          <label className="block text-sm font-medium text-gray-800 mb-1">Name</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 mb-4 text-sm"
+            required
+          />
 
-        <label className="block text-sm font-medium text-gray-800 mb-1">Password</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 mb-4 text-sm"
-          required
-          minLength={8}
-        />
+          <label className="block text-sm font-medium text-gray-800 mb-1">Email</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 mb-4 text-sm"
+            required
+          />
 
-        <label className="block text-sm font-medium text-gray-800 mb-1">I am a</label>
-        <select
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 mb-6 text-sm"
-        >
-          <option value="ATTENDEE">Attendee — I want to browse and buy tickets</option>
-          <option value="ORGANIZER">Organizer — I want to create events</option>
-        </select>
+          <label className="block text-sm font-medium text-gray-800 mb-1">Password</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 mb-4 text-sm"
+            required
+            minLength={8}
+          />
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-brand-purple text-white font-semibold rounded-lg py-2.5 text-sm disabled:opacity-50"
-        >
-          {loading ? 'Creating account...' : 'Create account'}
-        </button>
-      </form>
+          <label className="block text-sm font-medium text-gray-800 mb-1">I am a</label>
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 mb-6 text-sm"
+          >
+            <option value="ATTENDEE">Attendee — I want to browse and buy tickets</option>
+            <option value="ORGANIZER">Organizer — I want to create events</option>
+          </select>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-brand-purple text-white font-semibold rounded-lg py-3 text-sm disabled:opacity-50 mb-6"
+          >
+            {loading ? 'Creating account...' : 'Create account'}
+          </button>
+
+          <p className="text-sm text-gray-600 text-center">
+            Already have an account?{' '}
+            <Link href="/login" className="text-brand-purple font-semibold">
+              Login here
+            </Link>
+          </p>
+        </form>
+      </div>
     </div>
   );
 }
