@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRequireAuth } from '@/lib/hooks';
+import Link from 'next/link';
 import { getEvents } from '@/lib/api';
 
 interface EventItem {
@@ -65,7 +66,7 @@ export default function DashboardPage() {
         ) : (
           <div className="grid grid-cols-3 gap-4">
             {events.map((event) => (
-              <div key={event.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+              <Link key={event.id} href={`/events/${event.id}`} className="bg-white border border-gray-200 rounded-xl overflow-hidden block hover:border-brand-purple transition-colors">
                 <div className="h-24 bg-gradient-to-br from-brand-purple to-brand-navy" />
                 <div className="p-4">
                   <p className="font-bold text-sm text-gray-900 mb-1">{event.title}</p>
@@ -81,7 +82,7 @@ export default function DashboardPage() {
                     </span>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

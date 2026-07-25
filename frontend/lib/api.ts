@@ -26,3 +26,9 @@ export async function getEvents() {
   const res = await fetch(`${API_URL}/events`);
   return res.json();
 }
+
+export async function getEvent(id: string) {
+  const res = await fetch(`${API_URL}/events/${id}`);
+  if (!res.ok) throw new Error('Event not found');
+  return res.json();
+}
