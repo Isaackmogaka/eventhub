@@ -108,3 +108,12 @@ export async function getPaymentStatus(holdId: string) {
   if (!res.ok) throw new Error(json.error || 'Failed to check payment status');
   return json;
 }
+
+export async function getMyTickets() {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/tickets/mine`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Failed to load tickets');
+  return res.json();
+}

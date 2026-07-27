@@ -48,7 +48,7 @@ export default function DashboardPage() {
         <nav className="flex-1 flex flex-col gap-1 text-sm">
           <span className="bg-brand-purple rounded-lg px-3 py-2.5 font-semibold">Dashboard</span>
           <span className="px-3 py-2.5 text-gray-300">Events</span>
-          <span className="px-3 py-2.5 text-gray-300">My Tickets</span>
+          <Link href="/my-tickets" className="px-3 py-2.5 text-gray-300 rounded-lg">My Tickets</Link>
         </nav>
         <button onClick={logout} className="text-left text-sm text-gray-300 px-3 py-2.5 hover:text-white">
           Logout
