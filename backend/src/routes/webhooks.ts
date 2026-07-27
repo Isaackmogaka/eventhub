@@ -5,7 +5,6 @@ import { broadcastAvailability } from '../lib/socket';
 const router = Router();
 
 router.post('/intasend', async (req, res) => {
-  console.log('RAW WEBHOOK PAYLOAD:', JSON.stringify(req.body, null, 2));
   const { challenge, invoice_id, state, api_ref } = req.body;
 
   if (challenge !== process.env.INTASEND_WEBHOOK_CHALLENGE) {
