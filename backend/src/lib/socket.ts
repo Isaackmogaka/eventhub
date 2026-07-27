@@ -17,3 +17,8 @@ export function broadcastAvailability(eventId: string, available: number) {
   if (!io) return;
   io.to(`event:${eventId}`).emit('availability-update', { eventId, available });
 }
+
+export function broadcastPaymentUpdate(userId: string, data: { holdId: string; status: string; ticket?: { id: string; qrCode: string } }) {
+  if (!io) return;
+  io.to(`user:${userId}`).emit('payment-update', data);
+}

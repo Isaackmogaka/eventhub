@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
-import { broadcastAvailability } from '../lib/socket';
+import { broadcastAvailability, broadcastPaymentUpdate } from '../lib/socket';
 
 const router = Router();
 
@@ -67,12 +67,24 @@ router.post('/intasend', async (req, res) => {
     broadcastAvailability(payment.eventId, available);
 
     console.log(`Payment ${payment.id} completed, ticket issued: ${qrCode}`);
+
+    const newTicket = await prisma.ticket.findUnique({ where: { paymentId: payment.id } });
+    broadcastPaymentUpdate(payment.userId, {
+      holdId: payment.holdId,
+      status: 'COMPLETED',
+      ticket: newTicket ? { id: newTicket.id, qrCode: newTicket.qrCode } : undefined,
+    });
   } else if (state === 'FAILED') {
     await prisma.payment.update({
       where: { id: payment.id },
       data: { status: 'FAILED' },
     });
     console.log(`Payment ${payment.id} failed`);
+
+    broadcastPaymentUpdate(payment.userId, {
+      holdId: payment.holdId,
+      status: 'FAILED',
+    });
   }
 
   res.status(200).json({ received: true });

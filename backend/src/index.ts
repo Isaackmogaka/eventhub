@@ -43,6 +43,10 @@ io.on('connection', (socket) => {
   socket.on('leave-event', (eventId: string) => {
     socket.leave(`event:${eventId}`);
   });
+
+  socket.on('join-user', (userId: string) => {
+    socket.join(`user:${userId}`);
+  });
 });
 
 const PORT = process.env.PORT || 4000;
