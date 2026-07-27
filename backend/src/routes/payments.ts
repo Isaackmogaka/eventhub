@@ -75,4 +75,28 @@ router.post('/:holdId/pay', requireAuth, async (req: AuthRequest, res) => {
   }
 });
 
+router.get('/:holdId/status', requireAuth, async (req: AuthRequest, res) => {
+  const { holdId } = req.params;
+
+  const payment = await prisma.payment.findUnique({
+    where: { holdId },
+    include: { ticket: true },
+  });
+
+  if (!payment) {
+    return res.status(404).json({ error: 'No payment found for this reservation' });
+  }
+
+  if (payment.userId !== req.userId) {
+    return res.status(403).json({ error: 'This payment does not belong to you' });
+  }
+
+  res.json({
+    status: payment.status,
+    ticket: payment.ticket
+      ? { id: payment.ticket.id, qrCode: payment.ticket.qrCode }
+      : null,
+  });
+});
+
 export default router;
