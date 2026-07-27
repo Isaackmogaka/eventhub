@@ -83,3 +83,28 @@ export async function cancelHold(holdId: string) {
   if (!res.ok) throw new Error(json.error || 'Failed to cancel reservation');
   return json;
 }
+
+export async function payWithMpesa(holdId: string, phoneNumber: string) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/payments/${holdId}/pay`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ phoneNumber }),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Failed to initiate payment');
+  return json;
+}
+
+export async function getPaymentStatus(holdId: string) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/payments/${holdId}/status`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Failed to check payment status');
+  return json;
+}

@@ -3,11 +3,11 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getEvent, createHold, cancelHold } from '@/lib/api';
+import { getEvent, createHold, cancelHold, payWithMpesa, getPaymentStatus } from '@/lib/api';
 import { io, Socket } from 'socket.io-client';
 import { useToast } from '@/lib/toast/ToastContext';
 import { Skeleton } from '@/lib/components/Skeleton';
-import { getToken } from '@/lib/auth';
+import { getToken, getUser } from '@/lib/auth';
 
 interface EventDetail {
   id: string;
@@ -45,6 +45,11 @@ export default function EventDetailPage() {
   const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
   const [liveAvailable, setLiveAvailable] = useState<number | null>(null);
 
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [paymentStep, setPaymentStep] = useState<'idle' | 'awaiting' | 'success' | 'failed'>('idle');
+  const [paymentError, setPaymentError] = useState('');
+  const [ticket, setTicket] = useState<{ id: string; qrCode: string } | null>(null);
+
   useEffect(() => {
     getEvent(id)
       .then(setEvent)
@@ -69,6 +74,32 @@ export default function EventDetailPage() {
       socket.disconnect();
     };
   }, [id]);
+
+  // Listen for payment confirmation, pushed directly to this user
+  useEffect(() => {
+    const user = getUser();
+    if (!user) return;
+
+    const socket: Socket = io(process.env.NEXT_PUBLIC_API_URL!);
+    socket.emit('join-user', user.id);
+
+    socket.on('payment-update', (data: { holdId: string; status: string; ticket?: { id: string; qrCode: string } }) => {
+      if (hold && data.holdId === hold.id) {
+        if (data.status === 'COMPLETED' && data.ticket) {
+          setPaymentStep('success');
+          setTicket(data.ticket);
+          showToast('Payment confirmed! Your ticket is ready.', 'success');
+        } else if (data.status === 'FAILED') {
+          setPaymentStep('failed');
+          showToast('Payment failed or was cancelled.', 'error');
+        }
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [hold]);
 
   // Countdown timer: recalculates every second while a hold is active
   useEffect(() => {
@@ -100,6 +131,22 @@ export default function EventDetailPage() {
       showToast('Reservation cancelled.', 'info');
     } catch (err) {
       setHoldError(err instanceof Error ? err.message : 'Failed to cancel reservation');
+    }
+  }
+
+  async function handlePay() {
+    if (!hold) return;
+    if (!/^2547\d{8}$/.test(phoneNumber)) {
+      setPaymentError('Enter a valid M-Pesa number, e.g. 254712345678');
+      return;
+    }
+    setPaymentError('');
+    try {
+      await payWithMpesa(hold.id, phoneNumber);
+      setPaymentStep('awaiting');
+      showToast('Check your phone to complete payment.', 'info');
+    } catch (err) {
+      setPaymentError(err instanceof Error ? err.message : 'Something went wrong');
     }
   }
 
@@ -238,14 +285,7 @@ export default function EventDetailPage() {
               {available > 0 ? `${available} tickets left` : 'Sold out'}
             </p>
           </div>
-          {hold ? (
-            <button
-              disabled
-              className="bg-status-green text-white font-semibold rounded-lg px-6 py-2.5 text-sm opacity-70 cursor-not-allowed"
-            >
-              Reserved — checkout in Phase 4
-            </button>
-          ) : (
+          {!hold && (
             <button
               onClick={handleGetTicket}
               disabled={available <= 0 || holding}
@@ -254,7 +294,54 @@ export default function EventDetailPage() {
               {holding ? 'Reserving...' : available > 0 ? 'Get Ticket' : 'Sold Out'}
             </button>
           )}
+
+          {hold && paymentStep === 'idle' && (
+            <div className="flex items-center gap-2">
+              <input
+                type="tel"
+                placeholder="254712345678"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm w-40"
+              />
+              <button
+                onClick={handlePay}
+                className="bg-status-green text-white font-semibold rounded-lg px-5 py-2.5 text-sm hover:opacity-90 active:scale-95 transition-all duration-150"
+              >
+                Pay with M-Pesa
+              </button>
+            </div>
+          )}
+
+          {hold && paymentStep === 'awaiting' && (
+            <div className="flex items-center gap-2 text-status-amber text-sm font-semibold">
+              <span className="w-2 h-2 rounded-full bg-status-amber animate-pulse"></span>
+              Check your phone…
+            </div>
+          )}
+
+          {hold && paymentStep === 'success' && ticket && (
+            <div className="text-right">
+              <p className="text-status-green text-sm font-bold mb-1">&#10003; Ticket confirmed</p>
+              <p className="text-xs text-gray-600 font-mono">{ticket.qrCode}</p>
+            </div>
+          )}
+
+          {hold && paymentStep === 'failed' && (
+            <button
+              onClick={() => setPaymentStep('idle')}
+              className="bg-status-red text-white font-semibold rounded-lg px-5 py-2.5 text-sm hover:opacity-90 active:scale-95 transition-all duration-150"
+            >
+              Payment failed — Try again
+            </button>
+          )}
         </div>
+
+        {paymentError && (
+          <div className="bg-status-red-bg border border-red-200 text-status-red text-sm rounded-lg p-3 mt-4">
+            {paymentError}
+          </div>
+        )}
       </div>
     </div>
   );
