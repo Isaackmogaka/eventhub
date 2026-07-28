@@ -8,7 +8,7 @@ const router = Router();
 const HOLD_DURATION_MINUTES = 10;
 
 router.post('/:eventId/hold', requireAuth, async (req: AuthRequest, res) => {
-  const { eventId } = req.params;
+  const eventId = String(req.params.eventId);
   const { quantity } = req.body;
 
   const qty = parseInt(quantity, 10);
@@ -38,7 +38,7 @@ router.post('/:eventId/hold', requireAuth, async (req: AuthRequest, res) => {
         _sum: { quantity: true },
       });
 
-      const heldQuantity = activeHolds._sum.quantity || 0;
+      const heldQuantity = activeHolds._sum?.quantity ?? 0;
       const available = event.totalTickets - event.ticketsSold - heldQuantity;
 
       if (qty > available) {
@@ -63,7 +63,7 @@ router.post('/:eventId/hold', requireAuth, async (req: AuthRequest, res) => {
       where: { eventId, status: 'ACTIVE', expiresAt: { gt: new Date() } },
       _sum: { quantity: true },
     });
-    const heldQty = activeHolds._sum.quantity || 0;
+    const heldQty = activeHolds._sum?.quantity ?? 0;
     const stillAvailable = events!.totalTickets - events!.ticketsSold - heldQty;
     broadcastAvailability(eventId, stillAvailable);
 
@@ -81,7 +81,7 @@ router.post('/:eventId/hold', requireAuth, async (req: AuthRequest, res) => {
 });
 
 router.post('/holds/:holdId/cancel', requireAuth, async (req: AuthRequest, res) => {
-  const { holdId } = req.params;
+  const holdId = String(req.params.holdId);
 
   const hold = await prisma.ticketHold.findUnique({ where: { id: holdId } });
 
