@@ -6,7 +6,7 @@ import intasend from '../lib/intasend';
 const router = Router();
 
 router.post('/:holdId/pay', requireAuth, async (req: AuthRequest, res) => {
-  const { holdId } = req.params;
+  const holdId = req.params.holdId as string;
   const { phoneNumber } = req.body;
 
   if (!phoneNumber || !/^2547\d{8}$/.test(phoneNumber)) {
@@ -76,7 +76,7 @@ router.post('/:holdId/pay', requireAuth, async (req: AuthRequest, res) => {
 });
 
 router.get('/:holdId/status', requireAuth, async (req: AuthRequest, res) => {
-  const { holdId } = req.params;
+  const holdId = req.params.holdId as string;
 
   const payment = await prisma.payment.findUnique({
     where: { holdId },
