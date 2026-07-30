@@ -27,4 +27,36 @@ router.get('/me', requireAuth, async (req: AuthRequest, res) => {
   res.json(user);
 });
 
+
+router.patch('/me', requireAuth, async (req: AuthRequest, res) => {
+  const { name, phone, bio, location, avatarUrl } = req.body;
+
+  const updatedUser = await prisma.user.update({
+    where: {
+      id: req.userId,
+    },
+    data: {
+      name,
+      phone,
+      bio,
+      location,
+      avatarUrl,
+    },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      role: true,
+      avatarUrl: true,
+      phone: true,
+      bio: true,
+      location: true,
+      createdAt: true,
+    },
+  });
+
+  res.json(updatedUser);
+});
+
 export default router;
+
