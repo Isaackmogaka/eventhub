@@ -24,6 +24,10 @@ model User {
   passwordHash String
   name         String
   role         Role     @default(ATTENDEE)
+  avatarUrl    String?
+  phone        String?
+  bio          String?
+  location     String?
   createdAt    DateTime @default(now())
 
   organizer Organizer?
