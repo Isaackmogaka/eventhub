@@ -1,10 +1,11 @@
 'use client';
 
-import { useToast } from '@/lib/toast/ToastContext';
-
 import { useEffect, useState } from 'react';
-import { getMyProfile, updateMyProfile } from '@/lib/api';
+import Link from 'next/link';
+import { getMyProfile, updateMyProfile, changePassword } from '@/lib/api';
 import { useRequireAuth } from '@/lib/hooks';
+import { useToast } from '@/lib/toast/ToastContext';
+import { Skeleton } from '@/lib/components/Skeleton';
 
 type Profile = {
   id: string;
@@ -19,11 +20,10 @@ type Profile = {
 };
 
 export default function ProfilePage() {
-  useRequireAuth();
+  const { user, checked, logout } = useRequireAuth();
   const { showToast } = useToast();
 
   const [profile, setProfile] = useState<Profile | null>(null);
-
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -31,7 +31,6 @@ export default function ProfilePage() {
     bio: '',
     avatarUrl: '',
   });
-
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -39,14 +38,15 @@ export default function ProfilePage() {
   });
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
 
   useEffect(() => {
+    if (!checked) return;
     async function loadProfile() {
       try {
         const data = await getMyProfile();
         setProfile(data);
-
         setFormData({
           name: data.name || '',
           phone: data.phone || '',
@@ -55,24 +55,20 @@ export default function ProfilePage() {
           avatarUrl: data.avatarUrl || '',
         });
       } catch (err) {
-        console.error(err);
-        setError('Unable to load your profile. Please try again later.');
+        showToast('Unable to load your profile.', 'error');
       } finally {
         setLoading(false);
       }
     }
-
     loadProfile();
-  }, []);
+  }, [checked]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-
+    setSaving(true);
     try {
       const updated = await updateMyProfile(formData);
-
       setProfile(updated);
-
       setFormData({
         name: updated.name || '',
         phone: updated.phone || '',
@@ -80,11 +76,11 @@ export default function ProfilePage() {
         bio: updated.bio || '',
         avatarUrl: updated.avatarUrl || '',
       });
-
-      alert('Profile updated successfully!');
+      showToast('Profile updated successfully!', 'success');
     } catch (err) {
-      console.error(err);
-      alert('Failed to update profile.');
+      showToast(err instanceof Error ? err.message : 'Failed to update profile.', 'error');
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -96,233 +92,171 @@ export default function ProfilePage() {
       return;
     }
 
+    setChangingPassword(true);
     try {
       await changePassword({
         currentPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword,
       });
-
       showToast('Password changed successfully!', 'success');
-
-      setPasswordData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
-      });
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
     } catch (err) {
-      console.error(err);
-
-      if (err instanceof Error) {
-        showToast(err.message, 'error');
-      } else {
-        showToast('Failed to change password.', 'error');
-      }
+      showToast(err instanceof Error ? err.message : 'Failed to change password.', 'error');
+    } finally {
+      setChangingPassword(false);
     }
   }
 
-  if (loading) {
-    return <p className="p-6">Loading profile...</p>;
-  }
-
-  if (!profile) {
-    return <p className="p-6">Failed to load profile.</p>;
-  }
+  if (!checked) return null;
 
   return (
-    <main className="max-w-3xl mx-auto p-6">
-      <h1 className="text-3xl font-bold">My Profile</h1>
-
-      <p className="mt-2 mb-8 text-gray-600">
-        Manage your account information and keep your profile up to date.
-      </p>
-
-      <div className="mb-8 flex flex-col items-center">
-        <img
-          src={
-            formData.avatarUrl ||
-            "https://placehold.co/120x120/E5E7EB/6B7280?text=User"
-          }
-          alt="Profile"
-          className="h-28 w-28 rounded-full border-4 border-gray-200 object-cover shadow"
-        />
-
-        <p className="mt-3 text-sm text-gray-500">
-          Profile Picture
-        </p>
-      </div>
-
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-sm"
-      >
-        <div className="border-b pb-4">
-          <h2 className="text-xl font-semibold text-gray-900">
-            Personal Information
-          </h2>
-
-          <p className="mt-1 text-sm text-gray-500">
-            Update your personal details below.
-          </p>
-        </div>
-        <div>
-          <label className="block mb-1 font-medium">Name</label>
-          <input
-            className="w-full rounded border p-2"
-            value={formData.name}
-            onChange={(e) =>
-              setFormData({ ...formData, name: e.target.value })
-            }
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium">Email</label>
-          <input
-            className="w-full rounded border p-2 bg-gray-100"
-            value={profile.email}
-            disabled
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium">Phone</label>
-          <input
-            className="w-full rounded border p-2"
-            value={formData.phone}
-            onChange={(e) =>
-              setFormData({ ...formData, phone: e.target.value })
-            }
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium">Location</label>
-          <input
-            className="w-full rounded border p-2"
-            value={formData.location}
-            onChange={(e) =>
-              setFormData({ ...formData, location: e.target.value })
-            }
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium">Bio</label>
-          <textarea
-            className="w-full rounded border p-2"
-            rows={4}
-            value={formData.bio}
-            onChange={(e) =>
-              setFormData({ ...formData, bio: e.target.value })
-            }
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium">Avatar URL</label>
-          <input
-            className="w-full rounded border p-2"
-            value={formData.avatarUrl}
-            onChange={(e) =>
-              setFormData({ ...formData, avatarUrl: e.target.value })
-            }
-          />
-        </div>
-
-        <div className="text-sm text-gray-600">
-          <strong>Role:</strong> {profile.role}
-        </div>
-
-        <div className="text-sm text-gray-600">
-          <strong>Joined:</strong>{" "}
-          {new Date(profile.createdAt).toLocaleDateString()}
-        </div>
-
-        <button
-          type="submit"
-          className="rounded-lg bg-brand-purple px-4 py-2 text-white text-sm font-semibold hover:bg-brand-purple-dark active:scale-95 transition-all duration-150"
-        >
-          Update Profile
+    <div className="min-h-screen bg-background flex">
+      <aside className="w-60 bg-brand-navy text-white p-4 flex flex-col">
+        <Link href="/" className="flex items-center gap-2 px-2 pb-6">
+          <div className="w-9 h-9 rounded-lg bg-brand-purple flex items-center justify-center font-bold text-sm">E</div>
+          <div>
+            <p className="font-bold text-sm">EventHub</p>
+            <p className="text-xs text-gray-400">Event Management</p>
+          </div>
+        </Link>
+        <nav className="flex-1 flex flex-col gap-1 text-sm">
+          <Link href="/dashboard" className="px-3 py-2.5 text-gray-300 rounded-lg">Dashboard</Link>
+          <Link href="/my-tickets" className="px-3 py-2.5 text-gray-300 rounded-lg">My Tickets</Link>
+          <span className="bg-brand-purple rounded-lg px-3 py-2.5 font-semibold">Profile</span>
+        </nav>
+        <button onClick={logout} className="text-left text-sm text-gray-300 px-3 py-2.5 hover:text-white">
+          Logout
         </button>
-      </form>
-      <div className="mt-8 rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
-        <div className="border-b pb-4">
-          <h2 className="text-xl font-semibold text-gray-900">
-            Security
-          </h2>
+      </aside>
 
-          <p className="mt-1 text-sm text-gray-500">
-            Change your account password.
-          </p>
-        </div>
+      <main className="flex-1 p-8 max-w-2xl">
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">My Profile</h1>
+        <p className="text-sm text-gray-600 mb-8">Manage your account information and keep your profile up to date.</p>
 
-        <form
-          onSubmit={handlePasswordChange}
-          className="mt-6 space-y-4"
-        >
-          <div>
-            <label className="mb-1 block font-medium">
-              Current Password
-            </label>
-
-            <input
-              type="password"
-              className="w-full rounded border p-2"
-              value={passwordData.currentPassword}
-              onChange={(e) =>
-                setPasswordData({
-                  ...passwordData,
-                  currentPassword: e.target.value,
-                })
-              }
-            />
+        {loading ? (
+          <div className="space-y-4">
+            <Skeleton className="h-28 w-28 rounded-full mx-auto" />
+            <Skeleton className="h-64 w-full rounded-xl" />
           </div>
+        ) : !profile ? (
+          <p className="text-sm text-gray-600">Failed to load profile.</p>
+        ) : (
+          <>
+            <div className="mb-8 flex flex-col items-center">
+              <img
+                src={formData.avatarUrl || 'https://placehold.co/120x120/EEEDFE/4F46E5?text=User'}
+                alt="Profile"
+                className="h-28 w-28 rounded-full border-4 border-white shadow-lg object-cover"
+              />
+              <p className="mt-3 text-xs text-gray-500">Profile Picture</p>
+            </div>
 
-          <div>
-            <label className="mb-1 block font-medium">
-              New Password
-            </label>
+            <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+              <div className="border-b border-gray-100 pb-4 mb-5">
+                <h2 className="text-sm font-bold text-gray-900">Personal Information</h2>
+                <p className="text-xs text-gray-600 mt-1">Update your personal details below.</p>
+              </div>
 
-            <input
-              type="password"
-              className="w-full rounded border p-2"
-              value={passwordData.newPassword}
-              onChange={(e) =>
-                setPasswordData({
-                  ...passwordData,
-                  newPassword: e.target.value,
-                })
-              }
-            />
-          </div>
+              <label className="block text-sm font-medium text-gray-800 mb-1">Name</label>
+              <input
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 mb-4 text-sm"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              />
 
-          <div>
-            <label className="mb-1 block font-medium">
-              Confirm Password
-            </label>
+              <label className="block text-sm font-medium text-gray-800 mb-1">Email</label>
+              <input
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 mb-4 text-sm bg-gray-50 text-gray-500"
+                value={profile.email}
+                disabled
+              />
 
-            <input
-              type="password"
-              className="w-full rounded border p-2"
-              value={passwordData.confirmPassword}
-              onChange={(e) =>
-                setPasswordData({
-                  ...passwordData,
-                  confirmPassword: e.target.value,
-                })
-              }
-            />
-          </div>
+              <label className="block text-sm font-medium text-gray-800 mb-1">Phone</label>
+              <input
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 mb-4 text-sm"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              />
 
-          <button
-            type="submit"
-            className="rounded-lg bg-brand-purple px-4 py-2 text-white text-sm font-semibold hover:bg-brand-purple-dark active:scale-95 transition-all duration-150"
-          >
-            Change Password
-          </button>
-        </form>
-      </div>
+              <label className="block text-sm font-medium text-gray-800 mb-1">Location</label>
+              <input
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 mb-4 text-sm"
+                value={formData.location}
+                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+              />
 
-    </main>
+              <label className="block text-sm font-medium text-gray-800 mb-1">Bio</label>
+              <textarea
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 mb-4 text-sm"
+                rows={3}
+                value={formData.bio}
+                onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+              />
+
+              <label className="block text-sm font-medium text-gray-800 mb-1">Avatar URL</label>
+              <input
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 mb-4 text-sm"
+                value={formData.avatarUrl}
+                onChange={(e) => setFormData({ ...formData, avatarUrl: e.target.value })}
+              />
+
+              <div className="flex items-center justify-between text-xs text-gray-500 mb-5 pt-2">
+                <span><strong className="text-gray-700">Role:</strong> {profile.role}</span>
+                <span><strong className="text-gray-700">Joined:</strong> {new Date(profile.createdAt).toLocaleDateString()}</span>
+              </div>
+
+              <button
+                type="submit"
+                disabled={saving}
+                className="bg-brand-purple text-white text-sm font-semibold rounded-lg px-5 py-2.5 disabled:opacity-50 hover:bg-brand-purple-dark active:scale-95 transition-all duration-150"
+              >
+                {saving ? 'Saving...' : 'Update Profile'}
+              </button>
+            </form>
+
+            <div className="bg-white border border-gray-200 rounded-xl p-6">
+              <div className="border-b border-gray-100 pb-4 mb-5">
+                <h2 className="text-sm font-bold text-gray-900">Security</h2>
+                <p className="text-xs text-gray-600 mt-1">Change your account password.</p>
+              </div>
+
+              <form onSubmit={handlePasswordChange}>
+                <label className="block text-sm font-medium text-gray-800 mb-1">Current Password</label>
+                <input
+                  type="password"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 mb-4 text-sm"
+                  value={passwordData.currentPassword}
+                  onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                />
+
+                <label className="block text-sm font-medium text-gray-800 mb-1">New Password</label>
+                <input
+                  type="password"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 mb-4 text-sm"
+                  value={passwordData.newPassword}
+                  onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                />
+
+                <label className="block text-sm font-medium text-gray-800 mb-1">Confirm Password</label>
+                <input
+                  type="password"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 mb-5 text-sm"
+                  value={passwordData.confirmPassword}
+                  onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                />
+
+                <button
+                  type="submit"
+                  disabled={changingPassword}
+                  className="bg-brand-purple text-white text-sm font-semibold rounded-lg px-5 py-2.5 disabled:opacity-50 hover:bg-brand-purple-dark active:scale-95 transition-all duration-150"
+                >
+                  {changingPassword ? 'Changing...' : 'Change Password'}
+                </button>
+              </form>
+            </div>
+          </>
+        )}
+      </main>
+    </div>
   );
 }
