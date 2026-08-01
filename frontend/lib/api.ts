@@ -117,3 +117,72 @@ export async function getMyTickets() {
   if (!res.ok) throw new Error('Failed to load tickets');
   return res.json();
 }
+
+export async function getMyProfile() {
+  const token = getToken();
+
+  const res = await fetch(`${API_URL}/profile/me`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const json = await res.json();
+
+  if (!res.ok) {
+    throw new Error(json.error || 'Failed to load profile');
+  }
+
+  return json;
+}
+
+export async function updateMyProfile(data: {
+  name?: string;
+  phone?: string;
+  bio?: string;
+  location?: string;
+  avatarUrl?: string;
+}) {
+  const token = getToken();
+
+  const res = await fetch(`${API_URL}/profile/me`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  const json = await res.json();
+
+  if (!res.ok) {
+    throw new Error(json.error || 'Failed to update profile');
+  }
+
+  return json;
+}
+
+export async function changePassword(data: {
+  currentPassword: string;
+  newPassword: string;
+}) {
+  const token = getToken();
+
+  const res = await fetch(`${API_URL}/profile/me/password`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  const json = await res.json();
+
+  if (!res.ok) {
+    throw new Error(json.error || 'Failed to change password');
+  }
+
+  return json;
+}
