@@ -10,7 +10,6 @@ import paymentsRoutes from './routes/payments';
 import webhooksRoutes from './routes/webhooks';
 import ticketsRoutes from './routes/tickets';
 import profileRoutes from './routes/profile';
-import profileRoutes from './routes/profile';
 import { expireStaleHolds } from './lib/expireHolds';
 import { setIO } from './lib/socket';
 
@@ -29,8 +28,6 @@ app.use('/events', eventsRoutes);
 app.use('/events', holdsRoutes);
 app.use('/payments', paymentsRoutes);
 app.use('/webhooks', webhooksRoutes);
-app.use('/tickets', ticketsRoutes);
-app.use('/profile', profileRoutes);
 app.use('/profile', profileRoutes);
 
 const httpServer = createServer(app);
