@@ -45,7 +45,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className="flex-1 flex items-center justify-center bg-background px-6">
+      <div className="flex-1 flex items-center justify-center bg-background px-6 py-10">
         <form onSubmit={handleSubmit} className="w-full max-w-sm">
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Welcome Back</h1>
           <p className="text-sm text-gray-600 mb-8">Sign in to your account</p>

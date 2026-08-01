@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { Sidebar } from '@/lib/components/Sidebar';
 import { useRequireAuth } from '@/lib/hooks';
 import { getEvents } from '@/lib/api';
 import { EventCardSkeleton } from '@/lib/components/EventCardSkeleton';
@@ -36,26 +37,10 @@ export default function DashboardPage() {
   const upcoming = [...events].sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime()).slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-background flex">
-      <aside className="w-60 bg-brand-navy text-white p-4 flex flex-col">
-        <Link href="/" className="flex items-center gap-2 px-2 pb-6">
-          <div className="w-9 h-9 rounded-lg bg-brand-purple flex items-center justify-center font-bold text-sm">E</div>
-          <div>
-            <p className="font-bold text-sm">EventHub</p>
-            <p className="text-xs text-gray-400">Event Management</p>
-          </div>
-        </Link>
-        <nav className="flex-1 flex flex-col gap-1 text-sm">
-          <span className="bg-brand-purple rounded-lg px-3 py-2.5 font-semibold">Dashboard</span>
-          <span className="px-3 py-2.5 text-gray-300">Events</span>
-          <Link href="/my-tickets" className="px-3 py-2.5 text-gray-300 rounded-lg">My Tickets</Link>
-        </nav>
-        <button onClick={logout} className="text-left text-sm text-gray-300 px-3 py-2.5 hover:text-white">
-          Logout
-        </button>
-      </aside>
+    <div className="min-h-screen bg-background flex flex-col md:flex-row">
+      <Sidebar active="dashboard" onLogout={logout} />
 
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-4 md:p-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-sm text-gray-600">
@@ -63,7 +48,7 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div className="bg-white border border-gray-200 rounded-xl p-4">
             <div className="w-9 h-9 rounded-lg bg-brand-purple flex items-center justify-center text-white text-sm mb-3">&#128197;</div>
             <p className="text-2xl font-bold text-gray-900">{events.length}</p>
@@ -86,7 +71,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <div className="bg-white border border-gray-200 rounded-xl p-5">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-sm font-bold text-gray-900">Upcoming Events</h2>
@@ -132,7 +117,7 @@ export default function DashboardPage() {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[...Array(3)].map((_, i) => (
               <EventCardSkeleton key={i} />
             ))}
@@ -140,7 +125,7 @@ export default function DashboardPage() {
         ) : events.length === 0 ? (
           <p className="text-sm text-gray-600">No events yet.</p>
         ) : (
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {events.map((event) => (
               <Link key={event.id} href={`/events/${event.id}`} className="bg-white border border-gray-200 rounded-xl overflow-hidden block hover:border-brand-purple hover:shadow-lg hover:scale-[1.02] transition-all duration-200">
                 <div className="h-24 bg-gradient-to-br from-brand-purple to-brand-navy" />

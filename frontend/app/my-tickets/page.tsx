@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { Sidebar } from '@/lib/components/Sidebar';
 import { useRequireAuth } from '@/lib/hooks';
 import { getMyTickets } from '@/lib/api';
 import { Skeleton } from '@/lib/components/Skeleton';
@@ -37,29 +38,14 @@ export default function MyTicketsPage() {
   if (!checked) return null;
 
   return (
-    <div className="min-h-screen bg-background flex">
-      <aside className="w-60 bg-brand-navy text-white p-4 flex flex-col">
-        <Link href="/" className="flex items-center gap-2 px-2 pb-6">
-          <div className="w-9 h-9 rounded-lg bg-brand-purple flex items-center justify-center font-bold text-sm">E</div>
-          <div>
-            <p className="font-bold text-sm">EventHub</p>
-            <p className="text-xs text-gray-400">Event Management</p>
-          </div>
-        </Link>
-        <nav className="flex-1 flex flex-col gap-1 text-sm">
-          <Link href="/dashboard" className="px-3 py-2.5 text-gray-300 rounded-lg">Dashboard</Link>
-          <span className="bg-brand-purple rounded-lg px-3 py-2.5 font-semibold">My Tickets</span>
-        </nav>
-        <button onClick={logout} className="text-left text-sm text-gray-300 px-3 py-2.5 hover:text-white">
-          Logout
-        </button>
-      </aside>
+    <div className="min-h-screen bg-background flex flex-col md:flex-row">
+      <Sidebar active="my-tickets" onLogout={logout} />
 
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-4 md:p-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-8">My Tickets</h1>
 
         {loading ? (
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
                 <Skeleton className="h-24 w-full rounded-none" />
@@ -83,7 +69,7 @@ export default function MyTicketsPage() {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {tickets.map((ticket) => (
               <Link
                 key={ticket.id}

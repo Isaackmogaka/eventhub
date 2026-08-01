@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { Sidebar } from '@/lib/components/Sidebar';
 import { getMyProfile, updateMyProfile, changePassword } from '@/lib/api';
 import { useRequireAuth } from '@/lib/hooks';
 import { useToast } from '@/lib/toast/ToastContext';
@@ -110,26 +111,10 @@ export default function ProfilePage() {
   if (!checked) return null;
 
   return (
-    <div className="min-h-screen bg-background flex">
-      <aside className="w-60 bg-brand-navy text-white p-4 flex flex-col">
-        <Link href="/" className="flex items-center gap-2 px-2 pb-6">
-          <div className="w-9 h-9 rounded-lg bg-brand-purple flex items-center justify-center font-bold text-sm">E</div>
-          <div>
-            <p className="font-bold text-sm">EventHub</p>
-            <p className="text-xs text-gray-400">Event Management</p>
-          </div>
-        </Link>
-        <nav className="flex-1 flex flex-col gap-1 text-sm">
-          <Link href="/dashboard" className="px-3 py-2.5 text-gray-300 rounded-lg">Dashboard</Link>
-          <Link href="/my-tickets" className="px-3 py-2.5 text-gray-300 rounded-lg">My Tickets</Link>
-          <span className="bg-brand-purple rounded-lg px-3 py-2.5 font-semibold">Profile</span>
-        </nav>
-        <button onClick={logout} className="text-left text-sm text-gray-300 px-3 py-2.5 hover:text-white">
-          Logout
-        </button>
-      </aside>
+    <div className="min-h-screen bg-background flex flex-col md:flex-row">
+      <Sidebar active="profile" onLogout={logout} />
 
-      <main className="flex-1 p-8 max-w-2xl">
+      <main className="flex-1 p-4 md:p-8 max-w-2xl">
         <h1 className="text-2xl font-bold text-gray-900 mb-1">My Profile</h1>
         <p className="text-sm text-gray-600 mb-8">Manage your account information and keep your profile up to date.</p>
 

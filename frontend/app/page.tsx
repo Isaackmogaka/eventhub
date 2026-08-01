@@ -60,7 +60,7 @@ export default function HomePage() {
         <h2 className="text-lg font-bold text-gray-900 mb-4">Upcoming events</h2>
 
         {loading ? (
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[...Array(6)].map((_, i) => (
               <EventCardSkeleton key={i} />
             ))}
@@ -68,7 +68,7 @@ export default function HomePage() {
         ) : events.length === 0 ? (
           <p className="text-sm text-gray-600">No events available yet. Check back soon.</p>
         ) : (
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {events.map((event) => (
               <Link
                 key={event.id}
