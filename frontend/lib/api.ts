@@ -186,3 +186,53 @@ export async function changePassword(data: {
 
   return json;
 }
+
+export async function getAdminStats() {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/admin/stats`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Failed to load stats');
+  return res.json();
+}
+
+export async function getAdminUsers() {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/admin/users`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Failed to load users');
+  return res.json();
+}
+
+export async function getAdminEvents() {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/admin/events`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Failed to load events');
+  return res.json();
+}
+
+export async function updateEventStatus(eventId: string, status: string) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/admin/events/${eventId}/status`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ status }),
+  });
+  if (!res.ok) throw new Error('Failed to update event status');
+  return res.json();
+}
+
+export async function getAdminPayments() {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/admin/payments`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Failed to load payments');
+  return res.json();
+}
