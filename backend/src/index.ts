@@ -29,6 +29,7 @@ app.use('/events', holdsRoutes);
 app.use('/payments', paymentsRoutes);
 app.use('/webhooks', webhooksRoutes);
 app.use('/profile', profileRoutes);
+app.use('/tickets', ticketsRoutes);
 
 const httpServer = createServer(app);
 
