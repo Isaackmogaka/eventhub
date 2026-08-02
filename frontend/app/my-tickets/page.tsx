@@ -24,7 +24,7 @@ interface TicketItem {
 }
 
 export default function MyTicketsPage() {
-  const { checked, logout } = useRequireAuth();
+  const { user, checked, logout } = useRequireAuth();
   const [tickets, setTickets] = useState<TicketItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -39,7 +39,7 @@ export default function MyTicketsPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col md:flex-row">
-      <Sidebar active="my-tickets" onLogout={logout} />
+      <Sidebar active="my-tickets" onLogout={logout} isAdmin={user?.role === 'ADMIN'} />
 
       <main className="flex-1 p-4 md:p-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-8">My Tickets</h1>

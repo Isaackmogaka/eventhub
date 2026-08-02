@@ -112,7 +112,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col md:flex-row">
-      <Sidebar active="profile" onLogout={logout} />
+      <Sidebar active="profile" onLogout={logout} isAdmin={user?.role === 'ADMIN'} />
 
       <main className="flex-1 p-4 md:p-8 max-w-2xl">
         <h1 className="text-2xl font-bold text-gray-900 mb-1">My Profile</h1>
