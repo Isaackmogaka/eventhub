@@ -9,6 +9,7 @@ import holdsRoutes from './routes/holds';
 import paymentsRoutes from './routes/payments';
 import webhooksRoutes from './routes/webhooks';
 import ticketsRoutes from './routes/tickets';
+import adminRoutes from './routes/admin';
 import profileRoutes from './routes/profile';
 import { expireStaleHolds } from './lib/expireHolds';
 import { setIO } from './lib/socket';
@@ -30,6 +31,7 @@ app.use('/payments', paymentsRoutes);
 app.use('/webhooks', webhooksRoutes);
 app.use('/profile', profileRoutes);
 app.use('/tickets', ticketsRoutes);
+app.use('/admin', adminRoutes);
 
 const httpServer = createServer(app);
 
@@ -51,6 +53,11 @@ io.on('connection', (socket) => {
   socket.on('join-user', (userId: string) => {
     socket.join(`user:${userId}`);
   });
+});
+
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({ error: 'Something went wrong. Please try again.' });
 });
 
 const PORT = process.env.PORT || 4000;
