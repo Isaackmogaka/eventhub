@@ -22,3 +22,8 @@ export function broadcastPaymentUpdate(userId: string, data: { holdId: string; s
   if (!io) return;
   io.to(`user:${userId}`).emit('payment-update', data);
 }
+
+export function broadcastAdminStats(stats: { userCount: number; eventCount: number; ticketCount: number; totalRevenueCents: number }) {
+  if (!io) return;
+  io.to('admin-room').emit('admin-stats-update', stats);
+}

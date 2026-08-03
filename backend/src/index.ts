@@ -53,6 +53,10 @@ io.on('connection', (socket) => {
   socket.on('join-user', (userId: string) => {
     socket.join(`user:${userId}`);
   });
+
+  socket.on('join-admin', () => {
+    socket.join('admin-room');
+  });
 });
 
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {

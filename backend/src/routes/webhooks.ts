@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
-import { broadcastAvailability, broadcastPaymentUpdate } from '../lib/socket';
+import { broadcastAvailability, broadcastPaymentUpdate, broadcastAdminStats } from '../lib/socket';
 
 const router = Router();
 
@@ -67,6 +67,19 @@ router.post('/intasend', async (req, res) => {
     broadcastAvailability(payment.eventId, available);
 
     console.log(`Payment ${payment.id} completed, ticket issued: ${qrCode}`);
+
+    const [userCount, eventCount, ticketCount, completedPayments] = await Promise.all([
+      prisma.user.count(),
+      prisma.event.count(),
+      prisma.ticket.count(),
+      prisma.payment.findMany({ where: { status: 'COMPLETED' }, select: { amountCents: true } }),
+    ]);
+    broadcastAdminStats({
+      userCount,
+      eventCount,
+      ticketCount,
+      totalRevenueCents: completedPayments.reduce((sum, p) => sum + p.amountCents, 0),
+    });
 
     const newTicket = await prisma.ticket.findUnique({ where: { paymentId: payment.id } });
     broadcastPaymentUpdate(payment.userId, {
