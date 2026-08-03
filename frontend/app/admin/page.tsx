@@ -6,6 +6,7 @@ import { useToast } from '@/lib/toast/ToastContext';
 import { Sidebar } from '@/lib/components/Sidebar';
 import { Skeleton } from '@/lib/components/Skeleton';
 import { getAdminStats, getAdminUsers, getAdminEvents, updateEventStatus, getAdminPayments } from '@/lib/api';
+import { io } from 'socket.io-client';
 
 type Tab = 'overview' | 'users' | 'events' | 'payments';
 
@@ -33,6 +34,18 @@ export default function AdminPage() {
       })
       .catch(() => showToast('Failed to load admin data', 'error'))
       .finally(() => setLoading(false));
+  }, [checked, user]);
+
+  useEffect(() => {
+    if (!checked || user?.role !== 'ADMIN') return;
+    const socket = io(process.env.NEXT_PUBLIC_API_URL!);
+    socket.emit('join-admin');
+    socket.on('admin-stats-update', (newStats) => {
+      setStats(newStats);
+    });
+    return () => {
+      socket.disconnect();
+    };
   }, [checked, user]);
 
   async function handleCancelEvent(eventId: string) {
@@ -86,6 +99,11 @@ export default function AdminPage() {
         ) : (
           <>
             {tab === 'overview' && stats && (
+              <>
+              <div className="flex items-center gap-2 mb-4 text-xs font-semibold text-status-green">
+                <span className="w-2 h-2 rounded-full bg-status-green animate-pulse"></span>
+                Live &mdash; updates automatically
+              </div>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-white border border-gray-200 rounded-xl p-5">
                   <p className="text-2xl font-bold text-gray-900">{stats.userCount}</p>
@@ -106,6 +124,7 @@ export default function AdminPage() {
                   <p className="text-xs text-gray-400 mt-1">Total Revenue</p>
                 </div>
               </div>
+              </>
             )}
 
             {tab === 'users' && (
