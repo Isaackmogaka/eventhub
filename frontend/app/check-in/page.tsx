@@ -33,7 +33,7 @@ export default function CheckInPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col md:flex-row">
-      <Sidebar active="dashboard" onLogout={logout} isAdmin={user?.role === 'ADMIN'} />
+      <Sidebar active="dashboard" onLogout={logout} isAdmin={user?.role === 'ADMIN'} isOrganizer={user?.role === 'ORGANIZER'} />
       <main className="flex-1 p-4 md:p-8 max-w-md mx-auto w-full">
         <h1 className="text-2xl font-bold text-gray-900 mb-1">Ticket Check-In</h1>
         <p className="text-sm text-gray-600 mb-8">Enter or scan a ticket's QR code to confirm entry.</p>

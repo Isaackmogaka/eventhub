@@ -4,8 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 interface SidebarProps {
-  active: 'dashboard' | 'my-tickets' | 'profile' | 'admin';
+  active: 'dashboard' | 'my-tickets' | 'profile' | 'admin' | 'check-in';
   isAdmin?: boolean;
+  isOrganizer?: boolean;
   onLogout: () => void;
 }
 
@@ -15,12 +16,16 @@ const baseNavItems = [
   { key: 'profile', label: 'Profile', href: '/profile' },
 ] as const;
 
-export function Sidebar({ active, onLogout, isAdmin }: SidebarProps) {
+export function Sidebar({ active, onLogout, isAdmin, isOrganizer }: SidebarProps) {
   const [open, setOpen] = useState(false);
 
-  const navItems = isAdmin
-    ? [...baseNavItems, { key: 'admin' as const, label: 'Management', href: '/admin' }]
-    : baseNavItems;
+  let navItems = baseNavItems as readonly { key: string; label: string; href: string }[];
+  if (isAdmin || isOrganizer) {
+    navItems = [...navItems, { key: 'check-in', label: 'Check-In', href: '/check-in' }];
+  }
+  if (isAdmin) {
+    navItems = [...navItems, { key: 'admin', label: 'Management', href: '/admin' }];
+  }
 
   const content = (
     <>
