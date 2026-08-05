@@ -236,3 +236,15 @@ export async function getAdminPayments() {
   if (!res.ok) throw new Error('Failed to load payments');
   return res.json();
 }
+
+export async function checkInTicket(qrCode: string) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/tickets/check-in`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ qrCode }),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Check-in failed');
+  return json;
+}
