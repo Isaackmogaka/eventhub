@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { Sidebar } from '@/lib/components/Sidebar';
 import { useRequireAuth } from '@/lib/hooks';
 import { getMyTickets } from '@/lib/api';

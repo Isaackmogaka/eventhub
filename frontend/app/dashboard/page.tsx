@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { Sidebar } from '@/lib/components/Sidebar';
 import { useRequireAuth } from '@/lib/hooks';
 import { getEvents } from '@/lib/api';
@@ -48,7 +49,7 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <motion.div initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} transition={{duration:0.4}} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div className="bg-white border border-gray-200 rounded-xl p-4">
             <div className="w-9 h-9 rounded-lg bg-brand-purple flex items-center justify-center text-white text-sm mb-3">&#128197;</div>
             <p className="text-2xl font-bold text-gray-900">{events.length}</p>
@@ -69,7 +70,7 @@ export default function DashboardPage() {
             <p className="text-2xl font-bold text-gray-900">&mdash;</p>
             <p className="text-xs text-gray-400 mt-0.5">Saved Events (future)</p>
           </div>
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <div className="bg-white border border-gray-200 rounded-xl p-5">

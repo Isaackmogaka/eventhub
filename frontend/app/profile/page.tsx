@@ -133,7 +133,25 @@ export default function ProfilePage() {
                 alt="Profile"
                 className="h-28 w-28 rounded-full border-4 border-white shadow-lg object-cover"
               />
-              <p className="mt-3 text-xs text-gray-500">Profile Picture</p>
+              <label className="mt-3 text-xs font-semibold text-brand-purple cursor-pointer">
+                Change Photo
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    if (file.size > 1024 * 1024) {
+                      showToast('Image must be under 1MB.', 'error');
+                      return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = () => setFormData({ ...formData, avatarUrl: reader.result as string });
+                    reader.readAsDataURL(file);
+                  }}
+                />
+              </label>
             </div>
 
             <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
