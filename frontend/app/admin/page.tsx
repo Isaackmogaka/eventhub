@@ -14,6 +14,7 @@ export default function AdminPage() {
   const { user, checked, logout } = useRequireAuth();
   const { showToast } = useToast();
   const [tab, setTab] = useState<Tab>('overview');
+  const [search, setSearch] = useState('');
 
   const [stats, setStats] = useState<any>(null);
   const [users, setUsers] = useState<any[]>([]);
@@ -47,6 +48,14 @@ export default function AdminPage() {
       socket.disconnect();
     };
   }, [checked, user]);
+
+  const filteredUsers = users.filter((u) =>
+    u.name?.toLowerCase().includes(search.toLowerCase()) || u.email?.toLowerCase().includes(search.toLowerCase())
+  );
+  const filteredEvents = events.filter((e) => e.title?.toLowerCase().includes(search.toLowerCase()));
+  const filteredPayments = payments.filter((p) =>
+    p.event?.title?.toLowerCase().includes(search.toLowerCase()) || p.user?.name?.toLowerCase().includes(search.toLowerCase())
+  );
 
   async function handleCancelEvent(eventId: string) {
     try {
@@ -89,6 +98,15 @@ export default function AdminPage() {
             </button>
           ))}
         </div>
+
+        {tab !== 'overview' && !loading && (
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={`Search ${tab}...`}
+            className="w-full max-w-xs border border-gray-200 rounded-lg px-3 py-2 text-sm mb-4"
+          />
+        )}
 
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -139,7 +157,7 @@ export default function AdminPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {users.map((u) => (
+                    {filteredUsers.map((u) => (
                       <tr key={u.id} className="border-t border-gray-100">
                         <td className="px-4 py-3 font-medium text-gray-900">{u.name}</td>
                         <td className="px-4 py-3 text-gray-600">{u.email}</td>
@@ -169,7 +187,7 @@ export default function AdminPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {events.map((e) => (
+                    {filteredEvents.map((e) => (
                       <tr key={e.id} className="border-t border-gray-100">
                         <td className="px-4 py-3 font-medium text-gray-900">{e.title}</td>
                         <td className="px-4 py-3 text-gray-600">{e.organizer?.user?.name}</td>
@@ -217,7 +235,7 @@ export default function AdminPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {payments.map((p) => (
+                    {filteredPayments.map((p) => (
                       <tr key={p.id} className="border-t border-gray-100">
                         <td className="px-4 py-3 font-medium text-gray-900">{p.event?.title}</td>
                         <td className="px-4 py-3 text-gray-600">{p.user?.name}</td>
