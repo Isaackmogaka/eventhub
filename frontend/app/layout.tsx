@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/lib/toast/ToastContext";
 import { PageTransition } from "@/lib/components/PageTransition";
+import { CommandPalette } from "@/lib/components/CommandPalette";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,7 +30,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <ToastProvider><PageTransition>{children}</PageTransition></ToastProvider>
+        <ToastProvider><CommandPalette /><PageTransition>{children}</PageTransition></ToastProvider>
       </body>
     </html>
   );
