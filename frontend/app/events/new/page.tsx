@@ -22,6 +22,8 @@ export default function NewEventPage() {
   const [startsAt, setStartsAt] = useState('');
   const [price, setPrice] = useState('');
   const [totalTickets, setTotalTickets] = useState('');
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
 
   if (!checked) return null;
   if (user?.role !== 'ORGANIZER') {
@@ -50,6 +52,8 @@ export default function NewEventPage() {
         startsAt: new Date(startsAt).toISOString(),
         priceCents: Math.round(parseFloat(price) * 100),
         totalTickets: parseInt(totalTickets, 10),
+        latitude: latitude ? parseFloat(latitude) : undefined,
+        longitude: longitude ? parseFloat(longitude) : undefined,
       });
       router.push(`/events/${event.id}`);
     } catch (err) {
@@ -94,7 +98,27 @@ export default function NewEventPage() {
               {!isOnline && (
                 <>
                   <label className="block text-sm font-medium text-gray-800 mb-1">Location</label>
-                  <input className="w-full border border-gray-200 rounded-lg px-3 py-2 mb-4 text-sm" value={location} onChange={(e) => setLocation(e.target.value)} />
+                  <input className="w-full border border-gray-200 rounded-lg px-3 py-2 mb-2 text-sm" value={location} onChange={(e) => setLocation(e.target.value)} />
+                  <p className="text-xs text-gray-500 mb-2">
+                    Optional: add coordinates so attendees see a map.{' '}
+                    <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer" className="text-brand-purple font-semibold">
+                      Find on Google Maps &rarr;
+                    </a>
+                  </p>
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <input
+                      placeholder="Latitude e.g. -1.2921"
+                      className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                      value={latitude}
+                      onChange={(e) => setLatitude(e.target.value)}
+                    />
+                    <input
+                      placeholder="Longitude e.g. 36.8219"
+                      className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                      value={longitude}
+                      onChange={(e) => setLongitude(e.target.value)}
+                    />
+                  </div>
                 </>
               )}
               <label className="block text-sm font-medium text-gray-800 mb-1">Date &amp; time</label>

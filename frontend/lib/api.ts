@@ -39,6 +39,8 @@ export async function createEvent(data: {
   description?: string;
   category?: string;
   location?: string;
+  latitude?: number;
+  longitude?: number;
   isOnline: boolean;
   startsAt: string;
   priceCents: number;
