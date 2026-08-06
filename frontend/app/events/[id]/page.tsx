@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getEvent, createHold, cancelHold, payWithMpesa, getPaymentStatus } from '@/lib/api';
+import dynamic from 'next/dynamic';
+
+const LocationDisplay = dynamic(() => import('@/lib/components/LocationDisplay').then((m) => m.LocationDisplay), { ssr: false });
 import { io, Socket } from 'socket.io-client';
 import { useToast } from '@/lib/toast/ToastContext';
 import { Skeleton } from '@/lib/components/Skeleton';
@@ -15,6 +18,8 @@ interface EventDetail {
   description: string | null;
   category: string | null;
   location: string | null;
+  latitude: number | null;
+  longitude: number | null;
   isOnline: boolean;
   startsAt: string;
   priceCents: number;
@@ -247,6 +252,12 @@ export default function EventDetailPage() {
         <p className="text-sm text-gray-600 mb-6">
           &#128205; {event.isOnline ? 'Online' : event.location || 'Location TBA'}
         </p>
+
+        {!event.isOnline && event.latitude && event.longitude && (
+          <div className="mb-6">
+            <LocationDisplay lat={event.latitude} lng={event.longitude} />
+          </div>
+        )}
 
         {event.description && (
           <p className="text-sm text-gray-800 leading-relaxed mb-8">{event.description}</p>
