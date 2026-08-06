@@ -29,7 +29,7 @@ router.post('/', requireAuth, async (req: AuthRequest, res) => {
   const organizer = await prisma.organizer.findUnique({ where: { userId: req.userId } });
   if (!organizer) return res.status(400).json({ error: 'Organizer profile not found' });
 
-  const { title, description, category, location, isOnline, startsAt, priceCents, totalTickets } = req.body;
+  const { title, description, category, location, isOnline, startsAt, priceCents, totalTickets, latitude, longitude } = req.body;
 
   if (!title || !startsAt || priceCents == null || !totalTickets) {
     return res.status(400).json({ error: 'Missing required fields' });
@@ -42,6 +42,8 @@ router.post('/', requireAuth, async (req: AuthRequest, res) => {
       description,
       category,
       location,
+      latitude: latitude ? parseFloat(latitude) : null,
+      longitude: longitude ? parseFloat(longitude) : null,
       isOnline: !!isOnline,
       startsAt: new Date(startsAt),
       priceCents,

@@ -29,6 +29,8 @@ model User {
   phone        String?
   bio          String?
   location     String?
+  latitude     Float?
+  longitude    Float?
   createdAt    DateTime @default(now())
 
   organizer Organizer?
@@ -56,6 +58,8 @@ model Event {
   description  String?
   category     String?
   location     String?
+  latitude     Float?
+  longitude    Float?
   isOnline     Boolean     @default(false)
   startsAt     DateTime
   priceCents   Int
