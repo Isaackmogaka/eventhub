@@ -55,4 +55,40 @@ router.post('/', requireAuth, async (req: AuthRequest, res) => {
   res.status(201).json(event);
 });
 
+router.patch('/:id', requireAuth, async (req: AuthRequest, res) => {
+  const { id } = req.params;
+  const event = await prisma.event.findUnique({ where: { id }, include: { organizer: true } });
+
+  if (!event) return res.status(404).json({ error: 'Event not found' });
+
+  const isOwner = event.organizer.userId === req.userId;
+  if (!isOwner && req.role !== 'ADMIN') {
+    return res.status(403).json({ error: 'You can only edit your own events' });
+  }
+
+  const { title, description, category, location, latitude, longitude, isOnline, startsAt, priceCents, totalTickets } = req.body;
+
+  if (totalTickets !== undefined && totalTickets < event.ticketsSold) {
+    return res.status(400).json({ error: `Cannot set total tickets below ${event.ticketsSold} already sold` });
+  }
+
+  const updated = await prisma.event.update({
+    where: { id },
+    data: {
+      ...(title !== undefined && { title }),
+      ...(description !== undefined && { description }),
+      ...(category !== undefined && { category }),
+      ...(location !== undefined && { location }),
+      ...(latitude !== undefined && { latitude: latitude ? parseFloat(latitude) : null }),
+      ...(longitude !== undefined && { longitude: longitude ? parseFloat(longitude) : null }),
+      ...(isOnline !== undefined && { isOnline }),
+      ...(startsAt !== undefined && { startsAt: new Date(startsAt) }),
+      ...(priceCents !== undefined && { priceCents }),
+      ...(totalTickets !== undefined && { totalTickets }),
+    },
+  });
+
+  res.json(updated);
+});
+
 export default router;
