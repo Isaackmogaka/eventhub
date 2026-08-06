@@ -250,3 +250,15 @@ export async function checkInTicket(qrCode: string) {
   if (!res.ok) throw new Error(json.error || 'Check-in failed');
   return json;
 }
+
+export async function updateEvent(id: string, data: any) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/events/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Failed to update event');
+  return json;
+}

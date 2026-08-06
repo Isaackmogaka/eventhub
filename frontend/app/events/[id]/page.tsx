@@ -214,9 +214,19 @@ export default function EventDetailPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-3xl mx-auto px-6 py-10">
-        <Link href="/dashboard" className="text-sm text-gray-600 mb-6 inline-block">
-          &larr; Back to events
-        </Link>
+        <div className="flex items-center justify-between mb-6">
+          <Link href="/dashboard" className="text-sm text-gray-600">
+            &larr; Back to events
+          </Link>
+          {(() => {
+            const user = getUser();
+            return (user?.role === 'ORGANIZER' || user?.role === 'ADMIN') ? (
+              <Link href={`/events/${id}/edit`} className="text-sm font-semibold text-brand-purple">
+                Edit event
+              </Link>
+            ) : null;
+          })()}
+        </div>
 
         <div className="h-56 rounded-xl bg-gradient-to-br from-brand-purple to-brand-navy mb-6 relative">
           <div className="absolute top-3 left-3 bg-brand-purple text-white text-xs font-semibold px-3 py-1 rounded-full">
