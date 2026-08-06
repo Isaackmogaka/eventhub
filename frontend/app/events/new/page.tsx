@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRequireAuth } from '@/lib/hooks';
+import dynamic from 'next/dynamic';
+
+const LocationPicker = dynamic(() => import('@/lib/components/LocationPicker').then((m) => m.LocationPicker), { ssr: false });
 import { createEvent } from '@/lib/api';
 
 const steps = ['Details', 'Ticketing', 'Review'];
@@ -100,25 +103,19 @@ export default function NewEventPage() {
                   <label className="block text-sm font-medium text-gray-800 mb-1">Location</label>
                   <input className="w-full border border-gray-200 rounded-lg px-3 py-2 mb-2 text-sm" value={location} onChange={(e) => setLocation(e.target.value)} />
                   <p className="text-xs text-gray-500 mb-2">
-                    Optional: add coordinates so attendees see a map.{' '}
-                    <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer" className="text-brand-purple font-semibold">
-                      Find on Google Maps &rarr;
-                    </a>
+                    Optional: click the map to pin your exact venue.
                   </p>
-                  <div className="grid grid-cols-2 gap-3 mb-4">
-                    <input
-                      placeholder="Latitude e.g. -1.2921"
-                      className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
-                      value={latitude}
-                      onChange={(e) => setLatitude(e.target.value)}
-                    />
-                    <input
-                      placeholder="Longitude e.g. 36.8219"
-                      className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
-                      value={longitude}
-                      onChange={(e) => setLongitude(e.target.value)}
-                    />
-                  </div>
+                  <LocationPicker
+                    onPick={(lat, lng) => {
+                      setLatitude(lat.toString());
+                      setLongitude(lng.toString());
+                    }}
+                  />
+                  {latitude && longitude && (
+                    <p className="text-xs text-status-green font-semibold mt-2 mb-4">
+                      &#10003; Location pinned ({parseFloat(latitude).toFixed(4)}, {parseFloat(longitude).toFixed(4)})
+                    </p>
+                  )}
                 </>
               )}
               <label className="block text-sm font-medium text-gray-800 mb-1">Date &amp; time</label>
