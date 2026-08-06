@@ -48,4 +48,13 @@ router.post('/check-in', requireAuth, async (req: AuthRequest, res) => {
   res.json({ message: 'Checked in successfully', ticket: updated });
 });
 
+router.get('/summary', requireAuth, async (req: AuthRequest, res) => {
+  const [ticketCount, payments] = await Promise.all([
+    prisma.ticket.count({ where: { userId: req.userId, status: { not: 'CANCELLED' } } }),
+    prisma.payment.findMany({ where: { userId: req.userId, status: 'COMPLETED' }, select: { amountCents: true } }),
+  ]);
+  const totalSpentCents = payments.reduce((sum, p) => sum + p.amountCents, 0);
+  res.json({ ticketCount, totalSpentCents });
+});
+
 export default router;
