@@ -15,7 +15,8 @@ router.get('/', async (req, res) => {
 
 // Public: single event
 router.get('/:id', async (req, res) => {
-  const event = await prisma.event.findUnique({ where: { id: req.params.id } });
+  const eventId = req.params.id as string;
+  const event = await prisma.event.findUnique({ where: { id: eventId } });
   if (!event) return res.status(404).json({ error: 'Event not found' });
   res.json(event);
 });
@@ -56,7 +57,7 @@ router.post('/', requireAuth, async (req: AuthRequest, res) => {
 });
 
 router.patch('/:id', requireAuth, async (req: AuthRequest, res) => {
-  const { id } = req.params;
+  const id = req.params.id as string;
   const event = await prisma.event.findUnique({ where: { id }, include: { organizer: true } });
 
   if (!event) return res.status(404).json({ error: 'Event not found' });
