@@ -262,3 +262,12 @@ export async function updateEvent(id: string, data: any) {
   if (!res.ok) throw new Error(json.error || 'Failed to update event');
   return json;
 }
+
+export async function getTicketSummary() {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/tickets/summary`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Failed to load ticket summary');
+  return res.json();
+}

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Sidebar } from '@/lib/components/Sidebar';
 import { useRequireAuth } from '@/lib/hooks';
-import { getEvents } from '@/lib/api';
+import { getEvents, getTicketSummary } from '@/lib/api';
 import { EventCardSkeleton } from '@/lib/components/EventCardSkeleton';
 
 interface EventItem {
@@ -24,12 +24,14 @@ export default function DashboardPage() {
   const { user, checked, logout } = useRequireAuth();
   const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [summary, setSummary] = useState({ ticketCount: 0, totalSpentCents: 0 });
 
   useEffect(() => {
     if (!checked) return;
     getEvents()
       .then(setEvents)
       .finally(() => setLoading(false));
+    getTicketSummary().then(setSummary).catch(() => {});
   }, [checked]);
 
   if (!checked) return null;
@@ -57,13 +59,13 @@ export default function DashboardPage() {
           </div>
           <div className="bg-white border border-gray-200 rounded-xl p-4">
             <div className="w-9 h-9 rounded-lg bg-status-green flex items-center justify-center text-white text-sm mb-3">&#127915;</div>
-            <p className="text-2xl font-bold text-gray-900">&mdash;</p>
-            <p className="text-xs text-gray-400 mt-0.5">My Tickets (Phase 4)</p>
+            <p className="text-2xl font-bold text-gray-900">{summary.ticketCount}</p>
+            <p className="text-xs text-gray-400 mt-0.5">My Tickets</p>
           </div>
           <div className="bg-white border border-gray-200 rounded-xl p-4">
             <div className="w-9 h-9 rounded-lg bg-status-amber flex items-center justify-center text-white text-sm mb-3">&#128179;</div>
-            <p className="text-2xl font-bold text-gray-900">&mdash;</p>
-            <p className="text-xs text-gray-400 mt-0.5">Total Payments (Phase 4)</p>
+            <p className="text-2xl font-bold text-gray-900">KES {(summary.totalSpentCents / 100).toLocaleString()}</p>
+            <p className="text-xs text-gray-400 mt-0.5">Total Spent</p>
           </div>
           <div className="bg-white border border-gray-200 rounded-xl p-4">
             <div className="w-9 h-9 rounded-lg bg-status-blue flex items-center justify-center text-white text-sm mb-3">&#11088;</div>
@@ -101,7 +103,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-sm font-bold text-gray-900">Recent Tickets</h2>
             </div>
-            <p className="text-xs text-gray-600">Ticket history arrives in Phase 4, once payments are wired up.</p>
+            <p className="text-xs text-gray-600">See your full ticket history on the My Tickets page.</p>
           </div>
         </div>
 
