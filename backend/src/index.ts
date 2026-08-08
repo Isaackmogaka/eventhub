@@ -20,6 +20,10 @@ const app = express();
 app.use(cors({ origin: process.env.FRONTEND_URL }));
 app.use(express.json());
 
+app.get('/', (req, res) => {
+  res.json({ name: 'EventHub API', status: 'running' });
+});
+
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
