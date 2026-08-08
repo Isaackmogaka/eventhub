@@ -24,3 +24,8 @@ npm-debug.log*
 .claude/
 .windsurf/
 skills-lock.json
+
+# but allow example env files (no real secrets)
+!.env.example
+!backend/.env.example
+!frontend/.env.example
