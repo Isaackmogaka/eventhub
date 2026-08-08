@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import authRoutes from './routes/auth';
+import rateLimit from 'express-rate-limit';
 import eventsRoutes from './routes/events';
 import holdsRoutes from './routes/holds';
 import paymentsRoutes from './routes/payments';
@@ -28,7 +29,8 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-app.use('/auth', authRoutes);
+const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20, message: { error: 'Too many attempts, please try again later.' } });
+app.use('/auth', authLimiter, authRoutes);
 app.use('/events', eventsRoutes);
 app.use('/events', holdsRoutes);
 app.use('/payments', paymentsRoutes);
