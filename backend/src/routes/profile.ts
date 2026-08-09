@@ -100,3 +100,20 @@ router.patch('/me/password', requireAuth, async (req: AuthRequest, res) => {
 export default router;
 
 
+
+router.patch('/payout-number', requireAuth, async (req: AuthRequest, res) => {
+  const { phoneNumber } = req.body;
+  if (!phoneNumber || !/^2547\d{8}$/.test(phoneNumber)) {
+    return res.status(400).json({ error: 'Enter a valid M-Pesa number, e.g. 254712345678' });
+  }
+
+  const organizer = await prisma.organizer.findUnique({ where: { userId: req.userId } });
+  if (!organizer) return res.status(400).json({ error: 'Only organizers have a payout number' });
+
+  const updated = await prisma.organizer.update({
+    where: { userId: req.userId },
+    data: { payoutPhoneNumber: phoneNumber },
+  });
+
+  res.json({ payoutPhoneNumber: updated.payoutPhoneNumber });
+});
