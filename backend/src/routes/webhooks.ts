@@ -76,7 +76,8 @@ router.post('/intasend', async (req, res) => {
     });
 
     if (eventWithOrganizer?.organizer.payoutPhoneNumber) {
-      const feeCents = Math.round(payment.amountCents * 0.05);
+      const MIN_FEE_CENTS = 500; // KES 5 minimum, covers disbursement cost on cheap tickets
+      const feeCents = Math.max(Math.round(payment.amountCents * 0.05), MIN_FEE_CENTS);
       const payoutCents = payment.amountCents - feeCents;
 
       try {
