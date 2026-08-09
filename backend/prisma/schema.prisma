@@ -156,7 +156,7 @@ model Payout {
   amountCents   Int
   feeCents      Int
   phoneNumber   String
-  intasendRef   String?
+  intasendRef   String?      @unique
   status        PayoutStatus @default(PENDING)
   createdAt     DateTime     @default(now())
 }

@@ -6,7 +6,34 @@ import intasend from '../lib/intasend';
 const router = Router();
 
 router.post('/intasend', async (req, res) => {
-  const { challenge, invoice_id, state, api_ref } = req.body;
+  const { challenge, invoice_id, state, api_ref, tracking_id, status, transactions } = req.body;
+
+  if (challenge !== process.env.INTASEND_WEBHOOK_CHALLENGE) {
+    console.error('Webhook challenge mismatch — rejecting request');
+    return res.status(401).json({ error: 'Invalid challenge' });
+  }
+
+  // Send Money (payout) event — distinguished by tracking_id + transactions array
+  if (tracking_id && transactions) {
+    const payout = await prisma.payout.findUnique({ where: { intasendRef: tracking_id } });
+    if (!payout) {
+      console.log('Payout webhook for unknown tracking_id:', tracking_id);
+      return res.status(200).json({ received: true });
+    }
+    if (payout.status !== 'PENDING') {
+      return res.status(200).json({ message: 'Already processed' });
+    }
+
+    const txStatus = transactions[0]?.status;
+    const newStatus = txStatus === 'Successful' ? 'COMPLETED' : txStatus ? 'FAILED' : payout.status;
+
+    if (newStatus !== payout.status) {
+      await prisma.payout.update({ where: { id: payout.id }, data: { status: newStatus } });
+      console.log(`Payout ${payout.id} updated to ${newStatus}`);
+    }
+    return res.status(200).json({ received: true });
+  }
+
 
   if (challenge !== process.env.INTASEND_WEBHOOK_CHALLENGE) {
     console.error('Webhook challenge mismatch — rejecting request');
