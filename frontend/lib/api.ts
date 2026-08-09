@@ -271,3 +271,15 @@ export async function getTicketSummary() {
   if (!res.ok) throw new Error('Failed to load ticket summary');
   return res.json();
 }
+
+export async function setPayoutNumber(phoneNumber: string) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/profile/payout-number`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ phoneNumber }),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Failed to save payout number');
+  return json;
+}

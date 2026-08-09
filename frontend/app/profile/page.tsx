@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Sidebar } from '@/lib/components/Sidebar';
-import { getMyProfile, updateMyProfile, changePassword } from '@/lib/api';
+import { getMyProfile, updateMyProfile, changePassword, setPayoutNumber } from '@/lib/api';
 import { useRequireAuth } from '@/lib/hooks';
 import { useToast } from '@/lib/toast/ToastContext';
 import { Skeleton } from '@/lib/components/Skeleton';
@@ -41,6 +41,8 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
+  const [payoutPhone, setPayoutPhone] = useState('');
+  const [savingPayout, setSavingPayout] = useState(false);
 
   useEffect(() => {
     if (!checked) return;
@@ -105,6 +107,19 @@ export default function ProfilePage() {
       showToast(err instanceof Error ? err.message : 'Failed to change password.', 'error');
     } finally {
       setChangingPassword(false);
+    }
+  }
+
+  async function handleSavePayout(e: React.FormEvent) {
+    e.preventDefault();
+    setSavingPayout(true);
+    try {
+      await setPayoutNumber(payoutPhone);
+      showToast('Payout number saved', 'success');
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Failed to save', 'error');
+    } finally {
+      setSavingPayout(false);
     }
   }
 
@@ -257,6 +272,33 @@ export default function ProfilePage() {
                 </button>
               </form>
             </div>
+
+            {profile.role === 'ORGANIZER' && (
+              <div className="bg-white border border-gray-200 rounded-xl p-6 mt-6">
+                <div className="border-b border-gray-100 pb-4 mb-5">
+                  <h2 className="text-sm font-bold text-gray-900">Payout Settings</h2>
+                  <p className="text-xs text-gray-600 mt-1">
+                    Add your M-Pesa number to receive automatic payouts (95% of each ticket sale) when someone buys a ticket to your event.
+                  </p>
+                </div>
+                <form onSubmit={handleSavePayout}>
+                  <label className="block text-sm font-medium text-gray-800 mb-1">M-Pesa Number</label>
+                  <input
+                    placeholder="254712345678"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 mb-4 text-sm font-mono"
+                    value={payoutPhone}
+                    onChange={(e) => setPayoutPhone(e.target.value)}
+                  />
+                  <button
+                    type="submit"
+                    disabled={savingPayout}
+                    className="bg-status-green text-white text-sm font-semibold rounded-lg px-5 py-2.5 disabled:opacity-50 hover:opacity-90 active:scale-95 transition-all duration-150"
+                  >
+                    {savingPayout ? 'Saving...' : 'Save Payout Number'}
+                  </button>
+                </form>
+              </div>
+            )}
           </>
         )}
       </main>
