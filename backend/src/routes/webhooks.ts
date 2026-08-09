@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { broadcastAvailability, broadcastPaymentUpdate, broadcastAdminStats } from '../lib/socket';
+import intasend from '../lib/intasend';
 
 const router = Router();
 
@@ -67,6 +68,49 @@ router.post('/intasend', async (req, res) => {
     broadcastAvailability(payment.eventId, available);
 
     console.log(`Payment ${payment.id} completed, ticket issued: ${qrCode}`);
+
+    // Trigger organizer payout (5% platform fee, 95% to organizer)
+    const eventWithOrganizer = await prisma.event.findUnique({
+      where: { id: payment.eventId },
+      include: { organizer: true },
+    });
+
+    if (eventWithOrganizer?.organizer.payoutPhoneNumber) {
+      const feeCents = Math.round(payment.amountCents * 0.05);
+      const payoutCents = payment.amountCents - feeCents;
+
+      try {
+        const payoutsClient = intasend.payouts();
+        const payoutResponse = await payoutsClient.mpesa({
+          currency: 'KES',
+          requires_approval: 'NO',
+          transactions: [{
+            name: 'Organizer Payout',
+            account: eventWithOrganizer.organizer.payoutPhoneNumber,
+            amount: (payoutCents / 100).toString(),
+            narrative: `Payout for ${eventWithOrganizer.title}`,
+          }],
+        });
+
+        await prisma.payout.create({
+          data: {
+            paymentId: payment.id,
+            organizerId: eventWithOrganizer.organizerId,
+            amountCents: payoutCents,
+            feeCents,
+            phoneNumber: eventWithOrganizer.organizer.payoutPhoneNumber,
+            intasendRef: payoutResponse?.tracking_id || null,
+            status: 'PENDING',
+          },
+        });
+
+        console.log(`Payout initiated for organizer ${eventWithOrganizer.organizerId}: KES ${payoutCents / 100}`);
+      } catch (payoutErr) {
+        console.error('Payout failed:', payoutErr);
+      }
+    } else {
+      console.log(`No payout number set for organizer of event ${payment.eventId} — skipping payout`);
+    }
 
     const [userCount, eventCount, ticketCount, completedPayments] = await Promise.all([
       prisma.user.count(),
