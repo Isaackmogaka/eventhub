@@ -60,3 +60,61 @@ router.post('/login', async (req, res) => {
 });
 
 export default router;
+
+router.post('/forgot-password', async (req, res) => {
+  const { email } = req.body;
+  const user = await prisma.user.findUnique({ where: { email } });
+
+  // Always respond the same way, whether or not the email exists — prevents account enumeration
+  if (!user) {
+    return res.json({ message: 'If that email exists, a reset link has been sent.' });
+  }
+
+  const token = require('crypto').randomBytes(32).toString('hex');
+  const expiry = new Date(Date.now() + 60 * 60 * 1000);
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { resetToken: token, resetTokenExpiry: expiry },
+  });
+
+  const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+
+  try {
+    const { Resend } = require('resend');
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    await resend.emails.send({
+      from: 'EventHub <onboarding@resend.dev>',
+      to: email,
+      subject: 'Reset your EventHub password',
+      html: `<p>Click below to reset your password. This link expires in 1 hour.</p><p><a href="${resetUrl}">${resetUrl}</a></p>`,
+    });
+  } catch (err) {
+    console.error('Failed to send reset email:', err);
+  }
+
+  res.json({ message: 'If that email exists, a reset link has been sent.' });
+});
+
+router.post('/reset-password', async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  if (!token || !newPassword || newPassword.length < 8) {
+    return res.status(400).json({ error: 'Invalid request. Password must be at least 8 characters.' });
+  }
+
+  const user = await prisma.user.findUnique({ where: { resetToken: token } });
+
+  if (!user || !user.resetTokenExpiry || user.resetTokenExpiry < new Date()) {
+    return res.status(400).json({ error: 'This reset link is invalid or has expired.' });
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, 10);
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { passwordHash, resetToken: null, resetTokenExpiry: null },
+  });
+
+  res.json({ message: 'Password reset successfully. You can now log in.' });
+});

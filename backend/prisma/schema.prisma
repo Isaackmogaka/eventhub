@@ -26,6 +26,8 @@ model User {
   name         String
   role         Role     @default(ATTENDEE)
   avatarUrl    String?
+  resetToken   String?  @unique
+  resetTokenExpiry DateTime?
   phone        String?
   bio          String?
   location     String?
