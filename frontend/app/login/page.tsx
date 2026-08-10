@@ -84,9 +84,9 @@ export default function LoginPage() {
             {loading ? 'Signing in...' : 'Login'}
           </button>
 
-          <p className="text-sm text-brand-purple font-semibold text-center mb-6">
+          <Link href="/forgot-password" className="block text-sm text-brand-purple font-semibold text-center mb-6">
             Forgot Password?
-          </p>
+          </Link>
 
           <p className="text-sm text-gray-600 text-center">
             Don&apos;t have an account?{' '}

@@ -283,3 +283,23 @@ export async function setPayoutNumber(phoneNumber: string) {
   if (!res.ok) throw new Error(json.error || 'Failed to save payout number');
   return json;
 }
+
+export async function requestPasswordReset(email: string) {
+  const res = await fetch(`${API_URL}/auth/forgot-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+  return res.json();
+}
+
+export async function resetPassword(token: string, newPassword: string) {
+  const res = await fetch(`${API_URL}/auth/reset-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token, newPassword }),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Failed to reset password');
+  return json;
+}
