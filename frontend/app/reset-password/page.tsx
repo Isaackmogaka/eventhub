@@ -14,6 +14,7 @@ function ResetPasswordForm() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -86,22 +87,33 @@ function ResetPasswordForm() {
               <form onSubmit={handleSubmit}>
                 {error && <div className="bg-status-red-bg border border-red-200 text-status-red text-sm rounded-lg p-3 mb-4">{error}</div>}
                 <label className="block text-sm font-medium text-gray-800 mb-1">New Password</label>
-                <input
-                  type="password"
-                  required
-                  minLength={8}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 mb-4 text-sm"
-                />
+                <div className="relative mb-4">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    minLength={8}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 pr-10 text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"
+                  >
+                    {showPassword ? '\u{1F648}' : '\u{1F441}\uFE0F'}
+                  </button>
+                </div>
                 <label className="block text-sm font-medium text-gray-800 mb-1">Confirm Password</label>
-                <input
-                  type="password"
-                  required
-                  value={confirm}
-                  onChange={(e) => setConfirm(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 mb-6 text-sm"
-                />
+                <div className="relative mb-6">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={confirm}
+                    onChange={(e) => setConfirm(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 pr-10 text-sm"
+                  />
+                </div>
                 <button
                   type="submit"
                   disabled={loading}
