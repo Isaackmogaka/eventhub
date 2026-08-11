@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { loginUser } from '@/lib/api';
+import { PasswordInput } from '@/lib/components/PasswordInput';
 import { saveSession } from '@/lib/auth';
 
 export default function LoginPage() {
@@ -67,8 +68,7 @@ export default function LoginPage() {
           />
 
           <label className="block text-sm font-medium text-gray-800 mb-1">Password</label>
-          <input
-            type="password"
+          <PasswordInput
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter your password"
