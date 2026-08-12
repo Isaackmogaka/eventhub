@@ -47,6 +47,10 @@ router.post('/login', async (req, res) => {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
 
+  if (!user.passwordHash) {
+    return res.status(401).json({ error: 'This account uses Google Sign-In. Please continue with Google.' });
+  }
+
   const valid = await bcrypt.compare(password, user.passwordHash);
   if (!valid) {
     return res.status(401).json({ error: 'Invalid credentials' });
@@ -117,4 +121,53 @@ router.post('/reset-password', async (req, res) => {
   });
 
   res.json({ message: 'Password reset successfully. You can now log in.' });
+});
+
+router.post('/google', async (req, res) => {
+  const { credential } = req.body;
+  if (!credential) return res.status(400).json({ error: 'Missing Google credential' });
+
+  try {
+    const { OAuth2Client } = require('google-auth-library');
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload?.email) {
+      return res.status(400).json({ error: 'Google account has no email' });
+    }
+
+    let user = await prisma.user.findFirst({
+      where: { OR: [{ googleId: payload.sub }, { email: payload.email }] },
+    });
+
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          email: payload.email,
+          name: payload.name || payload.email.split('@')[0],
+          googleId: payload.sub,
+          role: 'ATTENDEE',
+        },
+      });
+    } else if (!user.googleId) {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: { googleId: payload.sub },
+      });
+    }
+
+    const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET!, {
+      expiresIn: '7d',
+    });
+
+    res.json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role } });
+  } catch (err) {
+    console.error('Google auth failed:', err);
+    res.status(401).json({ error: 'Invalid Google credential' });
+  }
 });

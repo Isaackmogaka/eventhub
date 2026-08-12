@@ -73,6 +73,10 @@ router.patch('/me/password', requireAuth, async (req: AuthRequest, res) => {
     return res.status(404).json({ error: 'User not found' });
   }
 
+  if (!user.passwordHash) {
+    return res.status(400).json({ error: 'This account uses Google Sign-In and has no password to change.' });
+  }
+
   const valid = await bcrypt.compare(currentPassword, user.passwordHash);
 
   if (!valid) {
