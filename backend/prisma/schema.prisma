@@ -22,12 +22,13 @@ enum EventStatus {
 model User {
   id           String   @id @default(uuid())
   email        String   @unique
-  passwordHash String
+  passwordHash String?
   name         String
   role         Role     @default(ATTENDEE)
   avatarUrl    String?
   resetToken   String?  @unique
   resetTokenExpiry DateTime?
+  googleId     String?  @unique
   phone        String?
   bio          String?
   location     String?
