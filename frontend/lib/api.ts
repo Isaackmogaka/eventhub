@@ -303,3 +303,14 @@ export async function resetPassword(token: string, newPassword: string) {
   if (!res.ok) throw new Error(json.error || 'Failed to reset password');
   return json;
 }
+
+export async function loginWithGoogle(credential: string) {
+  const res = await fetch(`${API_URL}/auth/google`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ credential }),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Google sign-in failed');
+  return json;
+}

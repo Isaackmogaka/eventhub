@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { loginUser } from '@/lib/api';
 import { PasswordInput } from '@/lib/components/PasswordInput';
+import { GoogleButton } from '@/lib/components/GoogleButton';
 import { saveSession } from '@/lib/auth';
 
 export default function LoginPage() {
