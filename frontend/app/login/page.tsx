@@ -89,6 +89,9 @@ export default function LoginPage() {
             Forgot Password?
           </Link>
 
+          <div className="mb-6">
+            <GoogleButton />
+          </div>
           <p className="text-sm text-gray-600 text-center">
             Don&apos;t have an account?{' '}
             <Link href="/register" className="text-brand-purple font-semibold">
