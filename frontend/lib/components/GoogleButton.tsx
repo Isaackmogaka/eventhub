@@ -18,10 +18,18 @@ export function GoogleButton() {
   const buttonRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (window.google?.accounts?.id) {
+      initializeGoogle();
+      return;
+    }
+
     const script = document.createElement('script');
     script.src = 'https://accounts.google.com/gsi/client';
     script.async = true;
-    script.onload = () => {
+    script.onload = initializeGoogle;
+    document.body.appendChild(script);
+
+    function initializeGoogle() {
       if (!window.google || !buttonRef.current) return;
 
       window.google.accounts.id.initialize({
@@ -43,12 +51,9 @@ export function GoogleButton() {
         width: 320,
         text: 'continue_with',
       });
-    };
-    document.body.appendChild(script);
+    }
 
-    return () => {
-      document.body.removeChild(script);
-    };
+    return () => {};
   }, []);
 
   return <div ref={buttonRef} className="flex justify-center" />;
