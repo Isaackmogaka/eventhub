@@ -3,6 +3,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function registerUser(data: { email: string; password: string; name: string; role: string }) {
   const res = await fetch(`${API_URL}/auth/register`, {
+    credentials: 'include',
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
@@ -14,6 +15,7 @@ export async function registerUser(data: { email: string; password: string; name
 
 export async function loginUser(data: { email: string; password: string }) {
   const res = await fetch(`${API_URL}/auth/login`, {
+    credentials: 'include',
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
@@ -46,12 +48,11 @@ export async function createEvent(data: {
   priceCents: number;
   totalTickets: number;
 }) {
-  const token = getToken();
   const res = await fetch(`${API_URL}/events`, {
+    credentials: 'include',
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(data),
   });
@@ -61,12 +62,11 @@ export async function createEvent(data: {
 }
 
 export async function createHold(eventId: string, quantity: number) {
-  const token = getToken();
   const res = await fetch(`${API_URL}/events/${eventId}/hold`, {
+    credentials: 'include',
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ quantity }),
   });
@@ -76,10 +76,9 @@ export async function createHold(eventId: string, quantity: number) {
 }
 
 export async function cancelHold(holdId: string) {
-  const token = getToken();
   const res = await fetch(`${API_URL}/events/holds/${holdId}/cancel`, {
+    credentials: 'include',
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
   });
   const json = await res.json();
   if (!res.ok) throw new Error(json.error || 'Failed to cancel reservation');
@@ -87,12 +86,11 @@ export async function cancelHold(holdId: string) {
 }
 
 export async function payWithMpesa(holdId: string, phoneNumber: string) {
-  const token = getToken();
   const res = await fetch(`${API_URL}/payments/${holdId}/pay`, {
+    credentials: 'include',
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ phoneNumber }),
   });
@@ -102,9 +100,8 @@ export async function payWithMpesa(holdId: string, phoneNumber: string) {
 }
 
 export async function getPaymentStatus(holdId: string) {
-  const token = getToken();
   const res = await fetch(`${API_URL}/payments/${holdId}/status`, {
-    headers: { Authorization: `Bearer ${token}` },
+    credentials: 'include',
   });
   const json = await res.json();
   if (!res.ok) throw new Error(json.error || 'Failed to check payment status');
@@ -112,20 +109,18 @@ export async function getPaymentStatus(holdId: string) {
 }
 
 export async function getMyTickets() {
-  const token = getToken();
   const res = await fetch(`${API_URL}/tickets/mine`, {
-    headers: { Authorization: `Bearer ${token}` },
+    credentials: 'include',
   });
   if (!res.ok) throw new Error('Failed to load tickets');
   return res.json();
 }
 
 export async function getMyProfile() {
-  const token = getToken();
 
   const res = await fetch(`${API_URL}/profile/me`, {
+    credentials: 'include',
     headers: {
-      Authorization: `Bearer ${token}`,
     },
   });
 
@@ -145,13 +140,12 @@ export async function updateMyProfile(data: {
   location?: string;
   avatarUrl?: string;
 }) {
-  const token = getToken();
 
   const res = await fetch(`${API_URL}/profile/me`, {
+    credentials: 'include',
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(data),
   });
@@ -169,13 +163,12 @@ export async function changePassword(data: {
   currentPassword: string;
   newPassword: string;
 }) {
-  const token = getToken();
 
   const res = await fetch(`${API_URL}/profile/me/password`, {
+    credentials: 'include',
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(data),
   });
@@ -190,39 +183,35 @@ export async function changePassword(data: {
 }
 
 export async function getAdminStats() {
-  const token = getToken();
   const res = await fetch(`${API_URL}/admin/stats`, {
-    headers: { Authorization: `Bearer ${token}` },
+    credentials: 'include',
   });
   if (!res.ok) throw new Error('Failed to load stats');
   return res.json();
 }
 
 export async function getAdminUsers() {
-  const token = getToken();
   const res = await fetch(`${API_URL}/admin/users`, {
-    headers: { Authorization: `Bearer ${token}` },
+    credentials: 'include',
   });
   if (!res.ok) throw new Error('Failed to load users');
   return res.json();
 }
 
 export async function getAdminEvents() {
-  const token = getToken();
   const res = await fetch(`${API_URL}/admin/events`, {
-    headers: { Authorization: `Bearer ${token}` },
+    credentials: 'include',
   });
   if (!res.ok) throw new Error('Failed to load events');
   return res.json();
 }
 
 export async function updateEventStatus(eventId: string, status: string) {
-  const token = getToken();
   const res = await fetch(`${API_URL}/admin/events/${eventId}/status`, {
+    credentials: 'include',
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ status }),
   });
@@ -231,19 +220,18 @@ export async function updateEventStatus(eventId: string, status: string) {
 }
 
 export async function getAdminPayments() {
-  const token = getToken();
   const res = await fetch(`${API_URL}/admin/payments`, {
-    headers: { Authorization: `Bearer ${token}` },
+    credentials: 'include',
   });
   if (!res.ok) throw new Error('Failed to load payments');
   return res.json();
 }
 
 export async function checkInTicket(qrCode: string) {
-  const token = getToken();
   const res = await fetch(`${API_URL}/tickets/check-in`, {
+    credentials: 'include',
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ qrCode }),
   });
   const json = await res.json();
@@ -252,10 +240,10 @@ export async function checkInTicket(qrCode: string) {
 }
 
 export async function updateEvent(id: string, data: any) {
-  const token = getToken();
   const res = await fetch(`${API_URL}/events/${id}`, {
+    credentials: 'include',
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
   const json = await res.json();
@@ -264,19 +252,18 @@ export async function updateEvent(id: string, data: any) {
 }
 
 export async function getTicketSummary() {
-  const token = getToken();
   const res = await fetch(`${API_URL}/tickets/summary`, {
-    headers: { Authorization: `Bearer ${token}` },
+    credentials: 'include',
   });
   if (!res.ok) throw new Error('Failed to load ticket summary');
   return res.json();
 }
 
 export async function setPayoutNumber(phoneNumber: string) {
-  const token = getToken();
   const res = await fetch(`${API_URL}/profile/payout-number`, {
+    credentials: 'include',
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ phoneNumber }),
   });
   const json = await res.json();
@@ -286,6 +273,7 @@ export async function setPayoutNumber(phoneNumber: string) {
 
 export async function requestPasswordReset(email: string) {
   const res = await fetch(`${API_URL}/auth/forgot-password`, {
+    credentials: 'include',
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email }),
@@ -295,6 +283,7 @@ export async function requestPasswordReset(email: string) {
 
 export async function resetPassword(token: string, newPassword: string) {
   const res = await fetch(`${API_URL}/auth/reset-password`, {
+    credentials: 'include',
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ token, newPassword }),
@@ -306,6 +295,7 @@ export async function resetPassword(token: string, newPassword: string) {
 
 export async function loginWithGoogle(credential: string) {
   const res = await fetch(`${API_URL}/auth/google`, {
+    credentials: 'include',
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ credential }),
