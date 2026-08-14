@@ -2,6 +2,7 @@ import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../lib/prisma';
+import { setAuthCookie, clearAuthCookie } from '../lib/authCookie';
 
 const router = Router();
 
@@ -36,6 +37,7 @@ router.post('/register', async (req, res) => {
     expiresIn: '7d',
   });
 
+  setAuthCookie(res, token);
   res.status(201).json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role } });
 });
 
@@ -60,7 +62,13 @@ router.post('/login', async (req, res) => {
     expiresIn: '7d',
   });
 
+  setAuthCookie(res, token);
   res.json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role } });
+});
+
+router.post('/logout', (req, res) => {
+  clearAuthCookie(res);
+  res.json({ message: 'Logged out' });
 });
 
 export default router;
@@ -165,7 +173,8 @@ router.post('/google', async (req, res) => {
       expiresIn: '7d',
     });
 
-    res.json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role } });
+    setAuthCookie(res, token);
+  res.json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role } });
   } catch (err) {
     console.error('Google auth failed:', err);
     res.status(401).json({ error: 'Invalid Google credential' });
