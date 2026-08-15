@@ -21,7 +21,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const data = await loginUser({ email, password });
-      saveSession(data.token, data.user);
+      saveSession(data.user);
       router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');

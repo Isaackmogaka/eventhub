@@ -1,4 +1,3 @@
-import { getToken } from './auth';
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function registerUser(data: { email: string; password: string; name: string; role: string }) {
@@ -303,4 +302,12 @@ export async function loginWithGoogle(credential: string) {
   const json = await res.json();
   if (!res.ok) throw new Error(json.error || 'Google sign-in failed');
   return json;
+}
+
+export async function logoutUser() {
+  const res = await fetch(`${API_URL}/auth/logout`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+  return res.json();
 }

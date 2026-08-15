@@ -10,7 +10,7 @@ const LocationDisplay = dynamic(() => import('@/lib/components/LocationDisplay')
 import { io, Socket } from 'socket.io-client';
 import { useToast } from '@/lib/toast/ToastContext';
 import { Skeleton } from '@/lib/components/Skeleton';
-import { getToken, getUser } from '@/lib/auth';
+import { getUser } from '@/lib/auth';
 
 interface EventDetail {
   id: string;
@@ -156,8 +156,8 @@ export default function EventDetailPage() {
   }
 
   async function handleGetTicket() {
-    const token = getToken();
-    if (!token) {
+    const user = getUser();
+    if (!user) {
       router.push('/login');
       return;
     }

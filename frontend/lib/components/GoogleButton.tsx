@@ -37,7 +37,7 @@ export function GoogleButton() {
         callback: async (response: { credential: string }) => {
           try {
             const data = await loginWithGoogle(response.credential);
-            saveSession(data.token, data.user);
+            saveSession(data.user);
             router.push('/dashboard');
           } catch (err) {
             showToast(err instanceof Error ? err.message : 'Google sign-in failed', 'error');

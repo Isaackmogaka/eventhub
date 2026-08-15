@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getToken, getUser, clearSession } from './auth';
+import { getMyProfile } from './api';
+import { getUser, saveSession, clearSession } from './auth';
+import { logoutUser } from './api';
 
 export function useRequireAuth() {
   const router = useRouter();
@@ -10,17 +12,21 @@ export function useRequireAuth() {
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    const token = getToken();
-    const storedUser = getUser();
-    if (!token || !storedUser) {
-      router.push('/login');
-      return;
-    }
-    setUser(storedUser);
-    setChecked(true);
+    getMyProfile()
+      .then((profile) => {
+        const u = { id: profile.id, email: profile.email, name: profile.name, role: profile.role };
+        saveSession(u);
+        setUser(u);
+        setChecked(true);
+      })
+      .catch(() => {
+        clearSession();
+        router.push('/login');
+      });
   }, [router]);
 
-  function logout() {
+  async function logout() {
+    await logoutUser();
     clearSession();
     router.push('/login');
   }
