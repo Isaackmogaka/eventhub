@@ -36,7 +36,14 @@ router.post('/:holdId/pay', requireAuth, async (req: AuthRequest, res) => {
 
   const existingPayment = await prisma.payment.findUnique({ where: { holdId } });
   if (existingPayment) {
-    return res.status(409).json({ error: 'A payment attempt already exists for this reservation' });
+    if (existingPayment.status === 'PENDING') {
+      return res.status(409).json({ error: 'A payment is already being processed for this reservation' });
+    }
+    if (existingPayment.status === 'FAILED') {
+      await prisma.payment.delete({ where: { id: existingPayment.id } });
+    } else {
+      return res.status(409).json({ error: 'This reservation has already been paid for' });
+    }
   }
 
   const amountCents = hold.event.priceCents * hold.quantity;
