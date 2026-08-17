@@ -80,5 +80,5 @@ httpServer.listen(PORT, () => {
 
   setInterval(() => {
     expireStaleHolds().catch((err) => console.error('Hold expiry sweep failed:', err));
-  }, 60 * 1000);
+  }, 5 * 60 * 1000);
 });
