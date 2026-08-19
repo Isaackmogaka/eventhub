@@ -1,0 +1,8 @@
+# Render deployment config (placeholder for future migration)
+# See ROADMAP.md for migration plan from Railway.
+services:
+  - type: web
+    name: eventhub-backend
+    env: node
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: npx prisma migrate deploy && npm start
