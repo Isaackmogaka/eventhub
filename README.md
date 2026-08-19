@@ -33,3 +33,8 @@ Frontend changes must be pushed to both remotes:
 git push
 git subtree push --prefix=frontend frontend-repo main
 ```
+
+## Current status
+Fully functional end-to-end: real M-Pesa payments via IntaSend, real-time
+ticket availability, organizer payouts, admin dashboard, Google OAuth,
+HttpOnly cookie authentication. See ROADMAP.md for hosting migration plans.
