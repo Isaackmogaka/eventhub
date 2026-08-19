@@ -103,7 +103,10 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-sm font-bold text-gray-900">Recent Tickets</h2>
             </div>
-            <p className="text-xs text-gray-600">See your full ticket history on the My Tickets page.</p>
+            <p className="text-xs text-gray-600 mb-2">Your confirmed tickets live on one dedicated page.</p>
+            <Link href="/my-tickets" className="text-xs font-semibold text-brand-purple">
+              View My Tickets &rarr;
+            </Link>
           </div>
         </div>
 
