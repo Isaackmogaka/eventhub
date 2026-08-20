@@ -29,3 +29,6 @@ skills-lock.json
 !.env.example
 !backend/.env.example
 !frontend/.env.example
+
+# Render deployment artifacts (future)
+.render-buildlogs/
