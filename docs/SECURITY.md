@@ -6,3 +6,7 @@
 - Headers: Helmet middleware enabled
 - Webhooks: verified via shared challenge string
 - CORS: locked to FRONTEND_URL only
+
+## Rate limit details
+Auth endpoints (/auth/*) are limited to 20 requests per 15-minute window per IP,
+returning a 429-equivalent JSON error rather than a raw block page.
