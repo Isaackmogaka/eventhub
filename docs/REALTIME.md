@@ -9,3 +9,7 @@
 - availability-update: { eventId, available }
 - payment-update: { holdId, status, ticket? }
 - admin-stats-update: { userCount, eventCount, ticketCount, totalRevenueCents }
+
+## Admin stats trigger
+admin-stats-update is recalculated and broadcast from within the webhook
+handler immediately after a payment completes, not on a polling interval.
