@@ -19,3 +19,7 @@ signed/rotating QR tokens, floor plan designer, email campaign builder, dark mod
 4. Update Vercel NEXT_PUBLIC_API_URL
 5. Update IntaSend webhook URL
 6. Verify live end-to-end before decommissioning Railway
+
+## Documentation coverage
+Architecture, API, Auth, Payments, Payouts, Realtime, Roles, Security, and
+Deployment are now documented under docs/. See README.md for the full index.
