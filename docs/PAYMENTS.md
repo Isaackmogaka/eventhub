@@ -9,3 +9,8 @@
 ## Payout states
 PENDING -> COMPLETED (IntaSend Send Money webhook confirms Successful)
 PENDING -> FAILED (webhook reports failure, or insufficient disbursement balance)
+
+## Idempotency
+Webhook handler checks payment/payout status before processing — a status
+other than PENDING short-circuits with 200 OK, preventing duplicate ticket
+issuance or duplicate payout processing on repeated webhook delivery.
