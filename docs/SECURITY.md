@@ -10,3 +10,7 @@
 ## Rate limit details
 Auth endpoints (/auth/*) are limited to 20 requests per 15-minute window per IP,
 returning a 429-equivalent JSON error rather than a raw block page.
+
+## CORS configuration
+Origin locked to FRONTEND_URL env var, credentials: true required for
+cross-origin cookies to be sent/received between the Vercel and backend domains.
