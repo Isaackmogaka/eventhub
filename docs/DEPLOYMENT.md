@@ -11,3 +11,9 @@ See backend/.env.example and frontend/.env.example
 ## Webhook configuration
 IntaSend webhook must point to: https://YOUR_BACKEND_URL/webhooks/intasend
 Update this after any backend host migration.
+
+## Pre-launch checklist
+- [ ] Switch IntaSend from sandbox to live keys
+- [ ] Fund IntaSend disbursement wallet for real payouts
+- [ ] Upgrade or monitor Neon compute usage
+- [ ] Confirm webhook URL matches production backend host
