@@ -17,3 +17,7 @@ Update this after any backend host migration.
 - [ ] Fund IntaSend disbursement wallet for real payouts
 - [ ] Upgrade or monitor Neon compute usage
 - [ ] Confirm webhook URL matches production backend host
+
+## Health check
+GET /health returns {"status":"ok"} and is used by Railway's deploy healthcheck.
+GET / returns basic API identification for anyone hitting the root by mistake.
