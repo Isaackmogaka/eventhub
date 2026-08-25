@@ -10,7 +10,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "EventHub backend API \u2014 Express, Prisma, Socket.io, IntaSend M-Pesa integration",
   "dependencies": {
     "@prisma/client": "^5.22.0",
     "bcrypt": "^6.0.0",
