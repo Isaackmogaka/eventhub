@@ -21,3 +21,9 @@ Update this after any backend host migration.
 ## Health check
 GET /health returns {"status":"ok"} and is used by Railway's deploy healthcheck.
 GET / returns basic API identification for anyone hitting the root by mistake.
+
+## Why two frontend repos
+Vercel is connected to eventhub-frontend (deploy-only mirror), while active
+development happens in the eventhub monorepo's frontend/ folder. This avoids
+Vercel needing a monorepo root-directory config that previously caused
+misconfiguration issues during initial deployment.
