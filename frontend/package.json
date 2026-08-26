@@ -30,5 +30,6 @@
     "eslint-config-next": "16.2.11",
     "tailwindcss": "^4",
     "typescript": "^5"
-  }
+  },
+  "description": "EventHub frontend \u2014 Next.js, TypeScript, Tailwind, real-time M-Pesa ticketing UI"
 }
