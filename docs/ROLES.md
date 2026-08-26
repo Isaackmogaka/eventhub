@@ -15,3 +15,7 @@
 - View platform-wide stats, users, events, payments
 - Cancel any event
 - Check in tickets at any event
+
+## Promoting a user to ADMIN
+No public endpoint exists for this by design. Done manually via
+`npx prisma studio`, editing the User.role field directly on the target row.
