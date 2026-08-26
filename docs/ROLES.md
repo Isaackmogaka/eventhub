@@ -19,3 +19,7 @@
 ## Promoting a user to ADMIN
 No public endpoint exists for this by design. Done manually via
 `npx prisma studio`, editing the User.role field directly on the target row.
+
+## Promoting a user to ADMIN
+No public endpoint exists for this by design. Done manually via
+`npx prisma studio`, editing the User.role field directly on the target row.
