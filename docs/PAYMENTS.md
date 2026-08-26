@@ -14,3 +14,8 @@ PENDING -> FAILED (webhook reports failure, or insufficient disbursement balance
 Webhook handler checks payment/payout status before processing — a status
 other than PENDING short-circuits with 200 OK, preventing duplicate ticket
 issuance or duplicate payout processing on repeated webhook delivery.
+
+## Fee structure rationale
+5% platform fee with a KES 5 minimum floor, based on Kenyan ticketing market
+rates (5-8% is standard). The floor protects margin on low-priced tickets
+where a pure percentage would fall below IntaSend's own transaction cost.
