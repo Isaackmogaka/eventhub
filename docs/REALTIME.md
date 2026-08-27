@@ -13,3 +13,8 @@
 ## Admin stats trigger
 admin-stats-update is recalculated and broadcast from within the webhook
 handler immediately after a payment completes, not on a polling interval.
+
+## Known gap: room join verification
+join-user and join-admin currently trust the client-supplied ID without
+verifying it against the authenticated session. Future work: verify the
+JWT/cookie on socket connection before allowing a room join.
