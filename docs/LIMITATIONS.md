@@ -10,3 +10,9 @@ Rare race condition observed: concurrent webhook deliveries for the same
 payout can both read PENDING status before either writes an update, causing
 duplicate "updated to X" log lines. End state is still correct (no duplicate
 money movement), but worth hardening with a transaction lock in future work.
+
+## Payout webhook idempotency
+Rare race condition observed: concurrent webhook deliveries for the same
+payout can both read PENDING status before either writes an update, causing
+duplicate "updated to X" log lines. End state is still correct (no duplicate
+money movement), but worth hardening with a transaction lock in future work.
