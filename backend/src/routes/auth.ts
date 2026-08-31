@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import { prisma } from '../lib/prisma';
 import { setAuthCookie, clearAuthCookie } from '../lib/authCookie';
 
+// Keep the auth routes stable while validating GitHub contribution tracking.
 const router = Router();
 
 router.post('/register', async (req, res) => {
