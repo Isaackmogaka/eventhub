@@ -19,8 +19,13 @@ import { setIO } from './lib/socket';
 
 dotenv.config();
 
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET must be set before starting the backend');
+}
+
 const app = express();
 app.use(helmet());
+app.use('/webhooks', express.raw({ type: 'application/json', limit: '5mb' }));
 app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 app.use(cookieParser());
 app.use(express.json({ limit: '5mb' }));
@@ -34,14 +39,16 @@ app.get('/health', (req, res) => {
 });
 
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20, message: { error: 'Too many attempts, please try again later.' } });
+const sensitiveLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 60, message: { error: 'Too many requests, please try again later.' } });
+
 app.use('/auth', authLimiter, authRoutes);
 app.use('/events', eventsRoutes);
 app.use('/events', holdsRoutes);
-app.use('/payments', paymentsRoutes);
+app.use('/payments', sensitiveLimiter, paymentsRoutes);
 app.use('/webhooks', webhooksRoutes);
-app.use('/profile', profileRoutes);
-app.use('/tickets', ticketsRoutes);
-app.use('/admin', adminRoutes);
+app.use('/profile', sensitiveLimiter, profileRoutes);
+app.use('/tickets', sensitiveLimiter, ticketsRoutes);
+app.use('/admin', sensitiveLimiter, adminRoutes);
 
 const httpServer = createServer(app);
 

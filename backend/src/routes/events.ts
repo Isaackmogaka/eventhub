@@ -6,11 +6,41 @@ const router = Router();
 
 // Public: list published events
 router.get('/', async (req, res) => {
-  const events = await prisma.event.findMany({
-    where: { status: 'PUBLISHED' },
-    orderBy: { startsAt: 'asc' },
+  const page = Math.max(1, Number(req.query.page) || 1);
+  const limit = Math.min(Math.max(1, Number(req.query.limit) || 12), 50);
+  const skip = (page - 1) * limit;
+
+  const [events, total] = await Promise.all([
+    prisma.event.findMany({
+      where: { status: 'PUBLISHED' },
+      orderBy: { startsAt: 'asc' },
+      skip,
+      take: limit,
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        category: true,
+        location: true,
+        isOnline: true,
+        startsAt: true,
+        priceCents: true,
+        totalTickets: true,
+        ticketsSold: true,
+        status: true,
+        createdAt: true,
+      },
+    }),
+    prisma.event.count({ where: { status: 'PUBLISHED' } }),
+  ]);
+
+  res.json({
+    items: events,
+    page,
+    limit,
+    total,
+    totalPages: Math.ceil(total / limit),
   });
-  res.json(events);
 });
 
 // Public: single event

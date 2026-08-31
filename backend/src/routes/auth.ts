@@ -1,13 +1,14 @@
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { prisma } from '../lib/prisma';
 import { setAuthCookie, clearAuthCookie } from '../lib/authCookie';
 
 const router = Router();
 
 router.post('/register', async (req, res) => {
-  const { email, password, name, role } = req.body;
+  const { email, password, name } = req.body;
 
   if (!email || !password || !name) {
     return res.status(400).json({ error: 'Missing required fields' });
@@ -25,7 +26,7 @@ router.post('/register', async (req, res) => {
       email,
       passwordHash,
       name,
-      role: role === 'ORGANIZER' ? 'ORGANIZER' : 'ATTENDEE',
+      role: 'ATTENDEE',
     },
   });
 
@@ -82,12 +83,13 @@ router.post('/forgot-password', async (req, res) => {
     return res.json({ message: 'If that email exists, a reset link has been sent.' });
   }
 
-  const token = require('crypto').randomBytes(32).toString('hex');
+  const token = crypto.randomBytes(32).toString('hex');
+  const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
   const expiry = new Date(Date.now() + 60 * 60 * 1000);
 
   await prisma.user.update({
     where: { id: user.id },
-    data: { resetToken: token, resetTokenExpiry: expiry },
+    data: { resetToken: tokenHash, resetTokenExpiry: expiry },
   });
 
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
@@ -115,7 +117,8 @@ router.post('/reset-password', async (req, res) => {
     return res.status(400).json({ error: 'Invalid request. Password must be at least 8 characters.' });
   }
 
-  const user = await prisma.user.findUnique({ where: { resetToken: token } });
+  const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+  const user = await prisma.user.findUnique({ where: { resetToken: tokenHash } });
 
   if (!user || !user.resetTokenExpiry || user.resetTokenExpiry < new Date()) {
     return res.status(400).json({ error: 'This reset link is invalid or has expired.' });

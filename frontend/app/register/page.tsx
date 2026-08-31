@@ -13,7 +13,6 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [role, setRole] = useState('ATTENDEE');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -22,7 +21,7 @@ export default function RegisterPage() {
     setError('');
     setLoading(true);
     try {
-      const data = await registerUser({ email, password, name, role });
+      const data = await registerUser({ email, password, name });
       saveSession(data.user);
       router.push('/dashboard');
     } catch (err) {
@@ -86,16 +85,6 @@ export default function RegisterPage() {
             required
             minLength={8}
           />
-
-          <label className="block text-sm font-medium text-gray-800 mb-1">I am a</label>
-          <select
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 mb-6 text-sm"
-          >
-            <option value="ATTENDEE">Attendee — I want to browse and buy tickets</option>
-            <option value="ORGANIZER">Organizer — I want to create events</option>
-          </select>
 
           <button
             type="submit"

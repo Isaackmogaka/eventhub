@@ -1,11 +1,15 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function registerUser(data: { email: string; password: string; name: string; role: string }) {
+export async function registerUser(data: { email: string; password: string; name: string; role?: string }) {
   const res = await fetch(`${API_URL}/auth/register`, {
     credentials: 'include',
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      email: data.email,
+      password: data.password,
+      name: data.name,
+    }),
   });
   const json = await res.json();
   if (!res.ok) throw new Error(json.error || 'Registration failed');

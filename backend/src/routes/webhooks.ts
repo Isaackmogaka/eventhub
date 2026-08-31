@@ -1,16 +1,57 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
+import crypto from 'crypto';
 import { prisma } from '../lib/prisma';
 import { broadcastAvailability, broadcastPaymentUpdate, broadcastAdminStats } from '../lib/socket';
 import intasend from '../lib/intasend';
 
 const router = Router();
 
-router.post('/intasend', async (req, res) => {
-  const { challenge, invoice_id, state, api_ref, tracking_id, status, transactions } = req.body;
+function getWebhookPayload(req: Request) {
+  const body = req.body;
 
-  if (challenge !== process.env.INTASEND_WEBHOOK_CHALLENGE) {
-    console.error('Webhook challenge mismatch — rejecting request');
-    return res.status(401).json({ error: 'Invalid challenge' });
+  if (Buffer.isBuffer(body)) {
+    return JSON.parse(body.toString('utf8') || '{}');
+  }
+
+  if (typeof body === 'string') {
+    return JSON.parse(body || '{}');
+  }
+
+  return body || {};
+}
+
+function verifyWebhookSignature(rawBody: Buffer, req: Request) {
+  const secret = process.env.INTASEND_SECRET_KEY;
+  const signatures = [
+    req.headers['x-intasend-signature'],
+    req.headers['x-intasend-webhook-signature'],
+    req.headers['x-signature'],
+    req.headers['signature'],
+  ].filter((value): value is string => typeof value === 'string' && Boolean(value));
+
+  if (secret && signatures.length > 0) {
+    const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+    if (signatures.some((signature) => signature.toLowerCase() === expected.toLowerCase())) {
+      return true;
+    }
+  }
+
+  const challenge = process.env.INTASEND_WEBHOOK_CHALLENGE;
+  if (challenge && typeof req.body === 'object' && req.body && 'challenge' in req.body) {
+    return req.body.challenge === challenge;
+  }
+
+  return false;
+}
+
+router.post('/intasend', async (req: Request, res: Response) => {
+  const rawBody = Buffer.isBuffer(req.body) ? req.body : Buffer.from(JSON.stringify(req.body || {}));
+  const payload = getWebhookPayload(req);
+  const { challenge, invoice_id, state, api_ref, tracking_id, status, transactions } = payload;
+
+  if (!verifyWebhookSignature(rawBody, req)) {
+    console.error('Webhook signature verification failed — rejecting request');
+    return res.status(401).json({ error: 'Invalid webhook signature' });
   }
 
   // Send Money (payout) event — distinguished by tracking_id + transactions array

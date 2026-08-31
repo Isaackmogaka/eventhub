@@ -21,19 +21,51 @@ router.get('/stats', async (req, res) => {
 });
 
 router.get('/users', async (req, res) => {
-  const users = await prisma.user.findMany({
-    orderBy: { createdAt: 'desc' },
-    select: { id: true, email: true, name: true, role: true, createdAt: true },
+  const page = Math.max(1, Number(req.query.page) || 1);
+  const limit = Math.min(Math.max(1, Number(req.query.limit) || 20), 100);
+  const skip = (page - 1) * limit;
+
+  const [users, total] = await Promise.all([
+    prisma.user.findMany({
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit,
+      select: { id: true, email: true, name: true, role: true, createdAt: true },
+    }),
+    prisma.user.count(),
+  ]);
+
+  res.json({
+    items: users,
+    page,
+    limit,
+    total,
+    totalPages: Math.ceil(total / limit),
   });
-  res.json(users);
 });
 
 router.get('/events', async (req, res) => {
-  const events = await prisma.event.findMany({
-    orderBy: { createdAt: 'desc' },
-    include: { organizer: { include: { user: { select: { name: true, email: true } } } } },
+  const page = Math.max(1, Number(req.query.page) || 1);
+  const limit = Math.min(Math.max(1, Number(req.query.limit) || 20), 100);
+  const skip = (page - 1) * limit;
+
+  const [events, total] = await Promise.all([
+    prisma.event.findMany({
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit,
+      include: { organizer: { include: { user: { select: { name: true, email: true } } } } },
+    }),
+    prisma.event.count(),
+  ]);
+
+  res.json({
+    items: events,
+    page,
+    limit,
+    total,
+    totalPages: Math.ceil(total / limit),
   });
-  res.json(events);
 });
 
 router.patch('/events/:id/status', async (req, res) => {
