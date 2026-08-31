@@ -11,3 +11,10 @@ on Vercel, update IntaSend webhook destination, run a full end-to-end test
 - Harden payout webhook idempotency against concurrent delivery race condition
 - Verify Socket.io room joins against the authenticated session
 - Consider Neon plan upgrade or usage monitoring given the 100 compute-hour limit
+
+## Monday findings
+Railway free trial confirmed expired — backend returns "Application not found".
+Researched Supabase as a Neon alternative: pauses after 7 days of *inactivity*
+(not a shrinking compute-hour budget like Neon), which fits a low-traffic
+portfolio site's usage pattern much better. Decision: migrate database to
+Supabase alongside the planned Render backend migration.
