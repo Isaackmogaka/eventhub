@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
+import { getEventListCache, getEventDetailCache, setEventListCache, setEventDetailCache } from '../lib/cache';
 import { requireAuth, AuthRequest } from '../middleware/auth';
 
 const router = Router();
@@ -8,6 +9,13 @@ const router = Router();
 router.get('/', async (req, res) => {
   const page = Math.max(1, Number(req.query.page) || 1);
   const limit = Math.min(Math.max(1, Number(req.query.limit) || 12), 50);
+  const cacheKey = `events:${page}:${limit}`;
+
+  const cached = getEventListCache<{ items: any[]; page: number; limit: number; total: number; totalPages: number }>(cacheKey);
+  if (cached) {
+    return res.json(cached);
+  }
+
   const skip = (page - 1) * limit;
 
   const [events, total] = await Promise.all([
@@ -34,20 +42,52 @@ router.get('/', async (req, res) => {
     prisma.event.count({ where: { status: 'PUBLISHED' } }),
   ]);
 
-  res.json({
+  const payload = {
     items: events,
     page,
     limit,
     total,
     totalPages: Math.ceil(total / limit),
-  });
+  };
+
+  setEventListCache(cacheKey, payload);
+  res.json(payload);
 });
 
 // Public: single event
 router.get('/:id', async (req, res) => {
   const eventId = req.params.id as string;
-  const event = await prisma.event.findUnique({ where: { id: eventId } });
+  const cacheKey = `event:${eventId}`;
+
+  const cached = getEventDetailCache<any>(cacheKey);
+  if (cached) {
+    return res.json(cached);
+  }
+
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      category: true,
+      location: true,
+      latitude: true,
+      longitude: true,
+      isOnline: true,
+      startsAt: true,
+      priceCents: true,
+      totalTickets: true,
+      ticketsSold: true,
+      status: true,
+      organizerId: true,
+      createdAt: true,
+    },
+  });
+
   if (!event) return res.status(404).json({ error: 'Event not found' });
+
+  setEventDetailCache(cacheKey, event);
   res.json(event);
 });
 

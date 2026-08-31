@@ -54,6 +54,10 @@ router.post('/intasend', async (req: Request, res: Response) => {
     return res.status(401).json({ error: 'Invalid webhook signature' });
   }
 
+  if (!challenge && !invoice_id && !tracking_id) {
+    return res.status(400).json({ error: 'Missing webhook payload' });
+  }
+
   // Send Money (payout) event — distinguished by tracking_id + transactions array
   if (tracking_id && transactions) {
     const payout = await prisma.payout.findUnique({ where: { intasendRef: tracking_id } });

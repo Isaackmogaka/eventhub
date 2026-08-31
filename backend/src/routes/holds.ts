@@ -18,25 +18,24 @@ router.post('/:eventId/hold', requireAuth, async (req: AuthRequest, res) => {
 
   try {
     const hold = await prisma.$transaction(async (tx) => {
-      // Lock the event row so no other transaction can read/write it until we're done.
-      const events = await tx.$queryRaw<{ id: string; totalTickets: number; ticketsSold: number }[]>`
-        SELECT id, "totalTickets", "ticketsSold" FROM "Event" WHERE id = ${eventId} FOR UPDATE
-      `;
+      const [eventRow, activeHolds] = await Promise.all([
+        tx.$queryRaw<{ id: string; totalTickets: number; ticketsSold: number }[]>`
+          SELECT id, "totalTickets", "ticketsSold" FROM "Event" WHERE id = ${eventId} FOR UPDATE
+        `,
+        tx.ticketHold.aggregate({
+          where: {
+            eventId,
+            status: 'ACTIVE',
+            expiresAt: { gt: new Date() },
+          },
+          _sum: { quantity: true },
+        }),
+      ]);
 
-      const event = events[0];
+      const event = eventRow[0];
       if (!event) {
         throw new Error('EVENT_NOT_FOUND');
       }
-
-      // Sum quantity from all currently active, non-expired holds for this event.
-      const activeHolds = await tx.ticketHold.aggregate({
-        where: {
-          eventId,
-          status: 'ACTIVE',
-          expiresAt: { gt: new Date() },
-        },
-        _sum: { quantity: true },
-      });
 
       const heldQuantity = activeHolds._sum?.quantity ?? 0;
       const available = event.totalTickets - event.ticketsSold - heldQuantity;
@@ -58,13 +57,15 @@ router.post('/:eventId/hold', requireAuth, async (req: AuthRequest, res) => {
       });
     });
 
-    const events = await prisma.event.findUnique({ where: { id: eventId } });
-    const activeHolds = await prisma.ticketHold.aggregate({
-      where: { eventId, status: 'ACTIVE', expiresAt: { gt: new Date() } },
-      _sum: { quantity: true },
-    });
+    const [event, activeHolds] = await Promise.all([
+      prisma.event.findUnique({ where: { id: eventId } }),
+      prisma.ticketHold.aggregate({
+        where: { eventId, status: 'ACTIVE', expiresAt: { gt: new Date() } },
+        _sum: { quantity: true },
+      }),
+    ]);
     const heldQty = activeHolds._sum?.quantity ?? 0;
-    const stillAvailable = events!.totalTickets - events!.ticketsSold - heldQty;
+    const stillAvailable = event!.totalTickets - event!.ticketsSold - heldQty;
     broadcastAvailability(eventId, stillAvailable);
 
     res.status(201).json(hold);
