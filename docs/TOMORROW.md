@@ -13,3 +13,7 @@
 8. Full end-to-end test: register, hold, pay, payout, check-in
 9. Set up a GitHub Actions scheduled ping to keep Supabase from
    pausing after 7 days of inactivity
+
+## Don't forget
+.github/workflows/keep-alive.yml has a placeholder YOUR_BACKEND_URL —
+update it to the real Render URL once step 5 is complete.
