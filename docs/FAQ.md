@@ -8,3 +8,8 @@ Frontend deploys from a separate mirrored repo. Run the subtree push documented 
 
 **Why does a Google-signed-up user get "no password to change"?**
 Google accounts have no passwordHash by design — they authenticate via Google only.
+
+**Why did we move off Neon and Railway?**
+Neon's compute-hour budget caused a full mid-month pause; Railway's free
+trial credit expired. Supabase and Render were chosen as free-tier
+alternatives better suited to a low-traffic portfolio project.
