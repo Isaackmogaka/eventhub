@@ -9,3 +9,6 @@ services:
 # Note: this file is a reference/placeholder. Actual service configuration
 # and environment variables are set directly in Render's dashboard per
 # docs/RENDER_ENV_CHECKLIST.md, not via this file, for the initial migration.
+# Note: this file is a reference/placeholder. Actual service configuration
+# and environment variables are set directly in Render's dashboard per
+# docs/RENDER_ENV_CHECKLIST.md, not via this file, for the initial migration.
