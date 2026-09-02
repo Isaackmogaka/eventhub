@@ -6,3 +6,6 @@ services:
     env: node
     buildCommand: npm install && npx prisma generate && npm run build
     startCommand: npx prisma migrate deploy && npm start
+# Note: this file is a reference/placeholder. Actual service configuration
+# and environment variables are set directly in Render's dashboard per
+# docs/RENDER_ENV_CHECKLIST.md, not via this file, for the initial migration.
