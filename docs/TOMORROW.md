@@ -17,3 +17,9 @@
 ## Don't forget
 .github/workflows/keep-alive.yml has a placeholder YOUR_BACKEND_URL —
 update it to the real Render URL once step 5 is complete.
+
+## Rollback plan
+Neon data remains untouched during migration (we're creating fresh tables
+on Supabase, not moving data). If Render/Supabase setup fails, the app
+can temporarily point back at the old Neon DATABASE_URL as a fallback,
+provided Neon's monthly compute quota has reset.
