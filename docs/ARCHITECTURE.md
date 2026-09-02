@@ -14,3 +14,6 @@ Socket.io rooms: event:{id} for live availability, user:{id} for payment updates
 ## Repository structure
 This is a monorepo (frontend/ + backend/) for development, mirrored to a
 separate frontend-only repo for Vercel deployment. See CONTRIBUTING.md.
+
+## Database provider history
+Originally Neon, migrating to Supabase — see docs/DATABASE_DECISION.md.
