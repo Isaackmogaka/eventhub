@@ -27,3 +27,7 @@ Vercel is connected to eventhub-frontend (deploy-only mirror), while active
 development happens in the eventhub monorepo's frontend/ folder. This avoids
 Vercel needing a monorepo root-directory config that previously caused
 misconfiguration issues during initial deployment.
+
+## Cold start expectation
+First request after idle may take 30-60 seconds on Render/Supabase free
+tiers. Subsequent requests are normal speed until the next idle period.
