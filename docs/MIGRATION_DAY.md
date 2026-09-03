@@ -8,3 +8,7 @@
 6. Update IntaSend webhook destination to new Render URL
 7. Run one real end-to-end test: hold, pay, payout, check-in
 8. Only then decommission Railway
+
+## Post-migration verification
+After full migration, re-run docs/TESTING.md checklist against the new
+Render + Supabase stack to confirm parity with the old Railway + Neon setup.
