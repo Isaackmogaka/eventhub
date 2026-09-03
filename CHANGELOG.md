@@ -11,3 +11,7 @@
 - Organizer payouts (95/5 split) via IntaSend Send Money
 - Admin dashboard with live stats
 - Google OAuth sign-in
+
+## In progress
+- Migrating backend hosting from Railway to Render (free tier expired)
+- Migrating database from Neon to Supabase (better free-tier fit)
