@@ -38,3 +38,6 @@ git subtree push --prefix=frontend frontend-repo main
 Fully functional end-to-end: real M-Pesa payments via IntaSend, real-time
 ticket availability, organizer payouts, admin dashboard, Google OAuth,
 HttpOnly cookie authentication. See ROADMAP.md for hosting migration plans.
+
+## Hosting
+Frontend: Vercel. Backend: Render. Database: Supabase.
