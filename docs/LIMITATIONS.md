@@ -16,3 +16,8 @@ Rare race condition observed: concurrent webhook deliveries for the same
 payout can both read PENDING status before either writes an update, causing
 duplicate "updated to X" log lines. End state is still correct (no duplicate
 money movement), but worth hardening with a transaction lock in future work.
+
+## Free-tier hosting tradeoffs
+Both Render (backend) and Supabase (database) free tiers involve cold-start
+delays after idle periods. Acceptable for a portfolio project; would need
+paid tiers for a production launch with real, continuous traffic.
