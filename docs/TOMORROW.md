@@ -23,3 +23,7 @@ Neon data remains untouched during migration (we're creating fresh tables
 on Supabase, not moving data). If Render/Supabase setup fails, the app
 can temporarily point back at the old Neon DATABASE_URL as a fallback,
 provided Neon's monthly compute quota has reset.
+
+## Status: confirmed current
+Reviewed and confirmed accurate as the starting checklist for the
+Render + Supabase migration session.
