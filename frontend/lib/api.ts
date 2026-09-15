@@ -30,7 +30,10 @@ export async function loginUser(data: { email: string; password: string }) {
 
 export async function getEvents() {
   const res = await fetch(`${API_URL}/events`);
-  return res.json();
+  if (!res.ok) throw new Error('Failed to load events');
+
+  const json = await res.json();
+  return json.items;
 }
 
 export async function getEvent(id: string) {
